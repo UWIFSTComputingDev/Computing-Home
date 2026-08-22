@@ -17,7 +17,13 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: "Profile not found." }, { status: 404 });
         }
 
-        return NextResponse.json({ mode: "id" as const, profile });
+        let email: string | null = null;
+        if (profile.showEmail) {
+            const owner = await db.query.users.findFirst({ where: eq(users.id, profile.userId) });
+            email = owner?.email ?? null;
+        }
+
+        return NextResponse.json({ mode: "id" as const, profile: { ...profile, email } });
     }
 
     if (!name) {
@@ -30,6 +36,7 @@ export async function GET(request: NextRequest) {
         bio: profiles.bio,
         avatarUrl: profiles.avatarUrl,
         position: profiles.position,
+        showEmail: profiles.showEmail,
         email: users.email,
     };
 
@@ -41,7 +48,11 @@ export async function GET(request: NextRequest) {
         .where(ilike(profiles.displayName, name));
 
     if (exactMatches.length > 0) {
-        return NextResponse.json({ mode: "search" as const, exact: true, matches: exactMatches });
+        return NextResponse.json({
+            mode: "search" as const,
+            exact: true,
+            matches: exactMatches.map((match) => ({ ...match, email: match.showEmail ? match.email : null })),
+        });
     }
 
     const similarMatches = await db
@@ -50,5 +61,9 @@ export async function GET(request: NextRequest) {
         .innerJoin(users, eq(users.id, profiles.userId))
         .where(ilike(profiles.displayName, `%${name}%`));
 
-    return NextResponse.json({ mode: "search" as const, exact: false, matches: similarMatches });
+    return NextResponse.json({
+        mode: "search" as const,
+        exact: false,
+        matches: similarMatches.map((match) => ({ ...match, email: match.showEmail ? match.email : null })),
+    });
 }

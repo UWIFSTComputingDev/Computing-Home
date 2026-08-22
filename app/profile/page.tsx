@@ -35,9 +35,11 @@ export default async function ProfilePage() {
                                 bio: profile.bio,
                                 avatarUrl: profile.avatarUrl,
                                 position: profile.position,
+                                showEmail: profile.showEmail,
                             }
                             : null
                     }
+                    email={user.email}
                 />
             </main>
         </div>

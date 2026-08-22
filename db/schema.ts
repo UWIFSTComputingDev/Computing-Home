@@ -38,6 +38,7 @@ export const profiles = pgTable(
         avatarUrl: text("avatar_url"),
         // Arbitrary committee position label (e.g. "President"); null means not a committee member.
         position: text("position"),
+        showEmail: boolean("show_email").notNull().default(false),
         createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
         updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     },

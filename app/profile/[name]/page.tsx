@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
-import { AlertCircle, Search, UserRound } from "lucide-react";
+import { AlertCircle, Mail, Search, UserRound } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -31,9 +31,10 @@ type PublicProfile = {
     bio: string | null;
     avatarUrl: string | null;
     position: string | null;
+    email: string | null;
 };
 
-type SearchMatch = PublicProfile & { email: string };
+type SearchMatch = PublicProfile;
 
 type LookupResult =
     | { state: "profile"; profile: PublicProfile }
@@ -183,7 +184,9 @@ export default function PublicProfilePage() {
                                                     </Link>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-muted-foreground">{match.email}</TableCell>
+                                            <TableCell className="text-muted-foreground">
+                                                {match.email ?? <span className="italic">Hidden</span>}
+                                            </TableCell>
                                             <TableCell className="text-muted-foreground">
                                                 {match.position ? <Badge variant="secondary">{match.position}</Badge> : "—"}
                                             </TableCell>
@@ -222,6 +225,11 @@ function ProfileView({ profile }: { profile: PublicProfile }) {
                             </Badge>
                         )}
                     </div>
+                    {profile.email && (
+                        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                            <Mail className="size-3.5" /> {profile.email}
+                        </p>
+                    )}
                     {profile.bio && <p className="max-w-md text-sm text-muted-foreground">{profile.bio}</p>}
                     {!profile.bio && (
                         <p className="flex items-center gap-1 text-sm text-muted-foreground">

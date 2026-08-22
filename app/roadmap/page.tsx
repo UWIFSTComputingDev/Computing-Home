@@ -109,7 +109,7 @@ export default function RoadMapPage() {
 
     // Move course if already placed
     if (sourceYear && sourceSemester) {
-      const success = moveCourse({ y: sourceYear, s: sourceSemester }, { y: dropData.year, s: dropData.semester }, courseId);
+      const success = moveCourse({ y: sourceYear, s: sourceSemester as SemesterKey }, { y: dropData.year, s: dropData.semester }, courseId);
       if (!success) {
         toast({
           title: "Cannot move course",
@@ -142,8 +142,8 @@ export default function RoadMapPage() {
 
 
 
-  const handleRemove = (year: YearKey, semester: string, courseId: string) => {
-    removeCourse(year, semester as any, courseId)
+  const handleRemove = (year: YearKey, semester: SemesterKey, courseId: string) => {
+    removeCourse(year, semester, courseId)
   }
 
   const handleReset = () => {
@@ -163,14 +163,14 @@ export default function RoadMapPage() {
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-[color:var(--text)]">Course RoadMap</h1>
-              <p className="mt-1 text-sm text-[color:var(--muted)]">
+              <h1 className="text-3xl font-bold text-(--text)">Course RoadMap</h1>
+              <p className="mt-1 text-sm text-(--muted)">
                 Drag and drop courses to plan your academic journey
               </p>
             </div>
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 rounded-lg border border-[color:var(--border-color)] bg-[color:var(--card)] px-4 py-2 text-sm font-medium text-[color:var(--text)] transition-all hover:border-[color:var(--primary-color)] hover:bg-[color:var(--primary-color)]/10"
+              className="flex items-center gap-2 rounded-lg border border-(--border-color) bg-(--card) px-4 py-2 text-sm font-medium text-(--text) transition-all hover:border-(--primary-color) hover:bg-(--primary-color)/10"
             >
               <RotateCcw className="h-4 w-4" />
               Reset
@@ -182,14 +182,14 @@ export default function RoadMapPage() {
               {/* Mobile Sidebar Toggle */}
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--primary-color)] text-white shadow-lg"
+                className="lg:hidden fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-(--primary-color) text-white shadow-lg"
               >
                 {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
 
               {/* Sidebar */}
               <aside
-                className={`fixed inset-y-0 left-0 z-40 w-80 transform bg-[color:var(--bg)] p-4 transition-transform lg:relative lg:inset-auto lg:z-auto lg:w-auto lg:transform-none lg:p-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+                className={`fixed inset-y-0 left-0 z-40 w-80 transform bg-(--bg) p-4 transition-transform lg:relative lg:inset-auto lg:z-auto lg:w-auto lg:transform-none lg:p-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                   }`}
               >
                 <CourseSidebar />
@@ -199,7 +199,7 @@ export default function RoadMapPage() {
               <div className="space-y-6">
                 <YearTabs active={activeYear} onChange={setActiveYear} />
 
-                <div className="rounded-xl border border-[color:var(--border-color)] bg-[color:var(--card)] p-6">
+                <div className="rounded-xl border border-(--border-color) bg-(--card) p-6">
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     <SemesterColumn
                       label="Semester 1"
