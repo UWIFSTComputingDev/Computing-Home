@@ -161,9 +161,14 @@ export default function RoadmapPage() {
                     <p className="text-sm text-[color:var(--muted)] leading-relaxed line-clamp-3">
                       {course.description}
                     </p>
-                    <div className="mt-4 pt-4 border-t border-[color:var(--border-color)] flex items-center justify-between">
+                    <div className="mt-4 pt-4 border-t border-[color:var(--border-color)] flex items-center justify-between gap-2">
                       <span className="text-[10px] font-bold text-[color:var(--muted)] uppercase tracking-widest">Year {selectedYear} Core</span>
-                      <div className="h-2 w-2 rounded-full bg-[color:var(--primary-color)] animate-pulse" />
+                      <Link
+                        href={`/course/${course.id}`}
+                        className="text-xs font-semibold text-[color:var(--primary-color)] hover:underline"
+                      >
+                        Advice & questions
+                      </Link>
                     </div>
                   </div>
                 ))}
@@ -202,9 +207,14 @@ export default function RoadmapPage() {
                     <p className="text-sm text-[color:var(--muted)] leading-relaxed line-clamp-3">
                       {course.description}
                     </p>
-                    <div className="mt-4 pt-4 border-t border-[color:var(--border-color)] flex items-center justify-between">
+                    <div className="mt-4 pt-4 border-t border-[color:var(--border-color)] flex items-center justify-between gap-2">
                       <span className="text-[10px] font-bold text-[color:var(--muted)] uppercase tracking-widest">Year {selectedYear} Core</span>
-                      <div className="h-2 w-2 rounded-full bg-[color:var(--accent-color)] animate-pulse" />
+                      <Link
+                        href={`/course/${course.id}`}
+                        className="text-xs font-semibold text-[color:var(--accent-color)] hover:underline"
+                      >
+                        Advice & questions
+                      </Link>
                     </div>
                   </div>
                 ))}

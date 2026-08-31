@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react"
-import { LayoutDashboard, Users, UserCog, Settings } from "lucide-react"
+import { LayoutDashboard, Users, UserCog, Settings, MessageSquare } from "lucide-react"
 
 export interface AdminNavItem {
     label: string
@@ -16,6 +16,10 @@ export const adminNavSections: AdminNavSection[] = [
     {
         title: "Overview",
         items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard }],
+    },
+    {
+        title: "Moderation",
+        items: [{ label: "Course Submissions", href: "/admin/submissions", icon: MessageSquare }],
     },
     {
         title: "People",
