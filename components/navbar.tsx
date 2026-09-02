@@ -35,7 +35,6 @@ const navLinks = [
   { name: "Degree Planner", href: "/roadmap" },
   { name: "Dept. Book", href: "/dept-book" },
   { name: "Courses", href: "/courses" },
-  { name: "Share What You Know", href: "/share" },
 ]
 
 function isNavActive(pathname: string, href: string) {

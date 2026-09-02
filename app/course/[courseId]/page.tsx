@@ -10,6 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import {
     Empty,
     EmptyDescription,
     EmptyHeader,
@@ -20,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { ShareSubmissionForm } from "@/components/share-submission-form";
 import { useToast } from "@/hooks/use-toast";
 import { getCourseById } from "@/data/courses";
 
@@ -91,6 +99,8 @@ export default function CoursePage() {
     const [answersLoading, setAnswersLoading] = useState<Record<string, boolean>>({});
     const [answersError, setAnswersError] = useState<Record<string, string>>({});
     const [submittingAnswer, setSubmittingAnswer] = useState(false);
+    const [shareOpen, setShareOpen] = useState(false);
+    const [shareType, setShareType] = useState<"advice" | "question">("advice");
 
     const {
         register,
@@ -290,8 +300,16 @@ export default function CoursePage() {
                                     review.
                                 </CardDescription>
                             </div>
-                            <Button asChild variant="outline" className="shrink-0">
-                                <Link href={`/share?course=${course.id}`}>Share What You Know</Link>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="shrink-0"
+                                onClick={() => {
+                                    setShareType("advice");
+                                    setShareOpen(true);
+                                }}
+                            >
+                                Share What You Know
                             </Button>
                         </div>
                     </CardHeader>
@@ -330,8 +348,15 @@ export default function CoursePage() {
                                                     Be the first to share what you know about this course.
                                                 </EmptyDescription>
                                             </EmptyHeader>
-                                            <Button asChild variant="outline">
-                                                <Link href={`/share?course=${course.id}`}>Share advice</Link>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => {
+                                                    setShareType("advice");
+                                                    setShareOpen(true);
+                                                }}
+                                            >
+                                                Share advice
                                             </Button>
                                         </Empty>
                                     ) : (
@@ -366,8 +391,15 @@ export default function CoursePage() {
                                                     Be the first to start the conversation.
                                                 </EmptyDescription>
                                             </EmptyHeader>
-                                            <Button asChild variant="outline">
-                                                <Link href={`/share?course=${course.id}`}>Ask a question</Link>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => {
+                                                    setShareType("question");
+                                                    setShareOpen(true);
+                                                }}
+                                            >
+                                                Ask a question
                                             </Button>
                                         </Empty>
                                     ) : (
@@ -523,6 +555,24 @@ export default function CoursePage() {
                         )}
                     </CardContent>
                 </Card>
+                <Dialog open={shareOpen} onOpenChange={setShareOpen}>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+                        <DialogHeader>
+                            <DialogTitle>Share What You Know</DialogTitle>
+                            <DialogDescription>
+                                Your submission will be reviewed before it appears on this course page.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <ShareSubmissionForm
+                            key={`${shareOpen}-${shareType}-${course.id}`}
+                            defaultCourseId={course.id}
+                            defaultType={shareType}
+                            lockCourse
+                            embedded
+                            onDone={() => setShareOpen(false)}
+                        />
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     );
