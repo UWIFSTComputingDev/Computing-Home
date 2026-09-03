@@ -34,7 +34,14 @@ const navLinks = [
   { name: "RoadMap", href: "/tree" },
   { name: "Degree Planner", href: "/roadmap" },
   { name: "Dept. Book", href: "/dept-book" },
+  { name: "Courses", href: "/courses" },
 ]
+
+function isNavActive(pathname: string, href: string) {
+  if (href === "/") return pathname === "/"
+  if (href === "/courses") return pathname === "/courses" || pathname.startsWith("/course/")
+  return pathname === href
+}
 
 export function Navbar() {
   const pathname = usePathname()
@@ -103,7 +110,7 @@ export function Navbar() {
           <div className="hidden min-w-0 flex-1 items-center justify-center lg:flex">
             <div className="flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-border bg-(--card)/60 p-1 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {links.map((link) => {
-                const isActive = pathname === link.href
+                const isActive = isNavActive(pathname, link.href)
                 return (
                   <Link
                     key={link.href}
@@ -164,7 +171,7 @@ export function Navbar() {
           >
             <div className="space-y-1 px-4 pb-3 pt-2">
               {links.map((link) => {
-                const isActive = pathname === link.href
+                const isActive = isNavActive(pathname, link.href)
                 return (
                   <Link
                     key={link.href}
