@@ -1,6 +1,6 @@
 // lib/types.ts
 export type SemesterKey = "s1" | "s2" | "s3";
-export type YearKey = "y1" | "y2" | "y3";
+export type YearKey = "y1" | "y2" | "y3" | "y4";
 
 export type Term = { year: YearKey; semester: SemesterKey };
 
@@ -40,8 +40,14 @@ export interface BookPage {
   subtitle?: string;
   body?: string;
   image?: string;
-  tableData?: string[][]; 
+  tableData?: string[][];
   link?: string;
   linkText?: string;
-  sections?: BookSection[]; 
+  sections?: BookSection[];
+}
+
+export interface Classroom {
+  code: string;
+  title: string;
+  directions: string;
 }

@@ -3,14 +3,13 @@ import { NextResponse } from "next/server";
 
 import { db } from "@/db";
 import { profiles, submissions } from "@/db/schema";
-import { courses } from "@/data/courses";
+import { getCourseById } from "@/lib/courses";
 
 export async function GET(request: Request, { params }: { params: Promise<{ courseId: string }> }) {
     const { courseId } = await params;
 
     // Validate course exists
-    const courseExists = courses.some((course) => course.id === courseId);
-    if (!courseExists) {
+    if (!(await getCourseById(courseId))) {
         return NextResponse.json({ error: "Course not found." }, { status: 404 });
     }
 

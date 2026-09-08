@@ -5,10 +5,11 @@ import { useSearchParams } from "next/navigation";
 
 import { ShareSubmissionForm } from "@/components/share-submission-form";
 import { Spinner } from "@/components/ui/spinner";
-import { courses } from "@/data/courses";
+import { useCourses } from "@/hooks/use-courses";
 
 function ShareForm() {
     const searchParams = useSearchParams();
+    const { courses } = useCourses();
     const defaultCourseId = useMemo(() => {
         const courseParam = searchParams.get("course") ?? "";
         return courses.some((course) => course.id === courseParam) ? courseParam : "";

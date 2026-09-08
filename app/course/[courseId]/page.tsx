@@ -29,7 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { ShareSubmissionForm } from "@/components/share-submission-form";
 import { useToast } from "@/hooks/use-toast";
-import { getCourseById } from "@/data/courses";
+import { useCourses } from "@/hooks/use-courses";
 
 type CurrentUser = {
     id: string;
@@ -86,7 +86,8 @@ export default function CoursePage() {
     const params = useParams<{ courseId: string }>();
     const rawCourseId = params.courseId;
     const courseId = typeof rawCourseId === "string" ? decodeURIComponent(rawCourseId) : "";
-    const course = courseId ? getCourseById(courseId) : undefined;
+    const { courses } = useCourses();
+    const course = courseId ? courses.find((item) => item.id === courseId) : undefined;
 
     const { toast } = useToast();
     const [user, setUser] = useState<CurrentUser | null>(null);

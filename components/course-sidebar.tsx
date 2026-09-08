@@ -3,27 +3,30 @@
 import { useState } from "react";
 import { Search, ChevronDown, ChevronRight } from "lucide-react";
 import { CourseChip } from "./course-chip";
-import { getCoursesByYear } from "@/data/courses";
+import { useCourses } from "@/hooks/use-courses";
 import { useRoadmap } from "@/context/roadmap-context";
 import type { YearKey } from "@/lib/types";
 
-const YEARS: { key: YearKey; label: string; idx: 1|2|3 }[] = [
+const YEARS: { key: YearKey; label: string; idx: 1 | 2 | 3 | 4 }[] = [
   { key: "y1", label: "Year 1", idx: 1 },
   { key: "y2", label: "Year 2", idx: 2 },
   { key: "y3", label: "Year 3", idx: 3 },
+  { key: "y4", label: "Year 4", idx: 4 },
 ];
 
 export function CourseSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
   // keep expand state by numeric index for the UI toggle
-  const [expandedYears, setExpandedYears] = useState<Record<1|2|3, boolean>>({
+  const [expandedYears, setExpandedYears] = useState<Record<1 | 2 | 3 | 4, boolean>>({
     1: true,
     2: true,
     3: true,
+    4: true,
   });
   const { roadmap } = useRoadmap();
+  const { courses } = useCourses();
 
-  const toggleYear = (idx: 1|2|3) =>
+  const toggleYear = (idx: 1 | 2 | 3 | 4) =>
     setExpandedYears(prev => ({ ...prev, [idx]: !prev[idx] }));
 
   const isCoursePlaced = (courseId: string): boolean =>
@@ -33,7 +36,7 @@ export function CourseSidebar() {
 
   const filterCourses = (yearKey: YearKey) => {
     const q = searchQuery.toLowerCase();
-    return getCoursesByYear(yearKey).filter(
+    return courses.filter((course) => course.year === yearKey).filter(
       c =>
         !isCoursePlaced(c.id) &&
         (c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q))

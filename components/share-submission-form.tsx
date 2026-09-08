@@ -20,7 +20,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { courses, getCourseById } from "@/data/courses";
+import { useCourses } from "@/hooks/use-courses";
 import type { Course } from "@/lib/types";
 
 type CurrentUser = {
@@ -58,6 +58,7 @@ function CourseCombobox({
     const searchRef = useRef<HTMLInputElement>(null);
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
+    const { courses } = useCourses();
     const selected = courses.find((course) => course.id === value);
 
     const filtered = useMemo(() => {
@@ -207,7 +208,8 @@ export function ShareSubmissionForm({
     const [user, setUser] = useState<CurrentUser | null>(null);
     const [userLoaded, setUserLoaded] = useState(false);
     const [submittedCourseId, setSubmittedCourseId] = useState<string | null>(null);
-    const lockedCourse = lockCourse ? getCourseById(defaultCourseId) : undefined;
+    const { courses } = useCourses();
+    const lockedCourse = lockCourse ? courses.find((course) => course.id === defaultCourseId) : undefined;
 
     const {
         control,

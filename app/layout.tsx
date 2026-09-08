@@ -9,6 +9,7 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { CoursesProvider } from "@/hooks/use-courses"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -47,11 +48,13 @@ export default function RootLayout({
           {themeInitializationScript}
         </Script>
         <ThemeProvider>
-          <RoadmapProvider>
-            <Navbar />
-            {children}
-            <Footer />
-          </RoadmapProvider>
+          <CoursesProvider>
+            <RoadmapProvider>
+              <Navbar />
+              {children}
+              <Footer />
+            </RoadmapProvider>
+          </CoursesProvider>
           <Analytics />
           <Toaster /> {/* This is the engine that actually renders the message */}
         </ThemeProvider>

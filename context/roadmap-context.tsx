@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import type { Roadmap, YearKey, SemesterKey } from "@/lib/types"
 import { emptyRoadmap, defaultRoadmap } from "@/data/degree-template"
-import { getCourseById } from "@/data/courses"
+import { useCourses } from "@/hooks/use-courses"
 
 type RoadmapContextValue = {
   roadmap: Roadmap
@@ -18,17 +18,41 @@ type RoadmapContextValue = {
 const RoadmapContext = createContext<RoadmapContextValue | undefined>(undefined)
 
 const STORAGE_KEY = "roadmap_v1"
+const YEAR_KEYS: YearKey[] = ["y1", "y2", "y3", "y4"]
+const SEMESTER_KEYS: SemesterKey[] = ["s1", "s2", "s3"]
+
+function normalizeRoadmap(value: unknown): Roadmap {
+  if (!value || typeof value !== "object") return defaultRoadmap
+
+  const stored = value as Partial<Record<YearKey, Partial<Record<SemesterKey, unknown>>>>
+  const normalized = {} as Roadmap
+
+  for (const year of YEAR_KEYS) {
+    const storedYear = stored[year]
+    normalized[year] = {} as Record<SemesterKey, string[]>
+
+    for (const semester of SEMESTER_KEYS) {
+      const storedCourses = storedYear?.[semester]
+      normalized[year][semester] = Array.isArray(storedCourses)
+        ? storedCourses.filter((courseId): courseId is string => typeof courseId === "string")
+        : []
+    }
+  }
+
+  return normalized
+}
 
 export function RoadmapProvider({ children }: { children: ReactNode }) {
   const [roadmap, setRoadmap] = useState<Roadmap>(emptyRoadmap)
   const [isLoaded, setIsLoaded] = useState(false)
+  const { courses } = useCourses()
 
   // Load from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored) {
       try {
-        setRoadmap(JSON.parse(stored))
+        setRoadmap(normalizeRoadmap(JSON.parse(stored)))
       } catch {
         setRoadmap(defaultRoadmap)
       }
@@ -104,7 +128,7 @@ export function RoadmapProvider({ children }: { children: ReactNode }) {
 
   const getSemesterCredits = (y: YearKey, s: SemesterKey): number => {
     return roadmap[y][s].reduce((sum, courseId) => {
-      const course = getCourseById(courseId)
+      const course = courses.find((item) => item.id === courseId)
       return sum + (course?.credits || 0)
     }, 0)
   }

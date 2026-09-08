@@ -4,21 +4,22 @@
 import { CourseMarker } from "@/components/course-tree"
 import { BookOpen, Map, GraduationCap, BriefcaseBusiness, Gem, Presentation } from "lucide-react"
 import { useState } from 'react';
-import { courses } from "@/data/courses";
+import { useCourses } from "@/hooks/use-courses";
 import Link from "next/link"
 
 
 const degreeOptions = [
-  { key: 'bscs', label: 'B.Sc. Computer Science' },
-  { key: 'bsse', label: 'B.Sc. Software Engineering' },
-  { key: 'bita', label: 'B.Sc. Information Technology' },
-  { key: 'bscy', label: 'B.Sc. Cyber Security' },
+  { key: 'BSCS', label: 'B.Sc. Computer Science' },
+  { key: 'BSSE', label: 'B.Sc. Software Engineering' },
+  { key: 'BITA', label: 'B.Sc. Information Technology' },
+  { key: 'BSCY', label: 'B.Sc. Cyber Security' },
 ];
 
 const yearOptions = [
   { key: 1, label: 'Year 1' },
   { key: 2, label: 'Year 2' },
   { key: 3, label: 'Year 3' },
+  { key: 4, label: 'Year 4' },
 ];
 
 // --- Define Course Data ---
@@ -61,8 +62,9 @@ const visualMetadata: Record<string, VisualInfo> = {
   "SWEN3920": { position: "80%", icon: Map },
 };
 export default function RoadmapPage() {
-  const [selectedDegree, setSelectedDegree] = useState('bscs');
+  const [selectedDegree, setSelectedDegree] = useState('BSCS');
   const [selectedYear, setSelectedYear] = useState(0);
+  const { courses } = useCourses();
 
   const filteredCourses = courses
     .filter(course => {
@@ -70,7 +72,7 @@ export default function RoadmapPage() {
       if (!hasPosition) return false;
 
       const degreeMatch = selectedDegree === 'all' ||
-        (course.degrees?.includes(selectedDegree) ?? false);
+        (course.degrees?.some((degree) => degree.replace(/\s+/g, '').toUpperCase() === selectedDegree) ?? false);
 
 
       const yearMatch = course.year === `y${selectedYear}`;
@@ -97,8 +99,8 @@ export default function RoadmapPage() {
               key={option.key}
               onClick={() => setSelectedDegree(option.key)}
               className={`px-6 py-2 text-sm font-semibold rounded-full transition-all duration-200 ${selectedDegree === option.key
-                  ? "bg-[color:var(--primary-color)] text-white shadow-lg scale-105"
-                  : "bg-[color:var(--card)] text-[color:var(--text)] hover:bg-[color:var(--border-color)] border border-[color:var(--border-color)]"
+                ? "bg-[color:var(--primary-color)] text-white shadow-lg scale-105"
+                : "bg-[color:var(--card)] text-[color:var(--text)] hover:bg-[color:var(--border-color)] border border-[color:var(--border-color)]"
                 }`}
             >
               {option.label}
@@ -113,8 +115,8 @@ export default function RoadmapPage() {
               key={option.key}
               onClick={() => setSelectedYear(option.key)}
               className={`px-5 py-1.5 text-xs font-bold rounded-full border transition-all ${selectedYear === option.key
-                  ? "bg-[color:var(--primary-color)] border-[color:var(--primary-color)] text-white"
-                  : "bg-transparent border-[color:var(--border-color)] text-[color:var(--muted)] hover:border-[color:var(--primary-color)]"
+                ? "bg-[color:var(--primary-color)] border-[color:var(--primary-color)] text-white"
+                : "bg-transparent border-[color:var(--border-color)] text-[color:var(--muted)] hover:border-[color:var(--primary-color)]"
                 }`}
             >
               {option.label}

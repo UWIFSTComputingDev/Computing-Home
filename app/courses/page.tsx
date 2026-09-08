@@ -15,7 +15,7 @@ import {
     EmptyTitle,
 } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
-import { courses } from "@/data/courses";
+import { useCourses } from "@/hooks/use-courses";
 import type { YearKey } from "@/lib/types";
 
 const YEAR_FILTERS: { key: "all" | YearKey; label: string }[] = [
@@ -23,6 +23,7 @@ const YEAR_FILTERS: { key: "all" | YearKey; label: string }[] = [
     { key: "y1", label: "Year 1" },
     { key: "y2", label: "Year 2" },
     { key: "y3", label: "Year 3" },
+    { key: "y4", label: "Year 4" },
 ];
 
 function yearLabel(year: YearKey) {
@@ -32,6 +33,7 @@ function yearLabel(year: YearKey) {
 export default function CoursesPage() {
     const [query, setQuery] = useState("");
     const [yearFilter, setYearFilter] = useState<"all" | YearKey>("all");
+    const { courses, isLoading } = useCourses();
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -46,7 +48,7 @@ export default function CoursesPage() {
     }, [query, yearFilter]);
 
     const grouped = useMemo(() => {
-        const years: YearKey[] = ["y1", "y2", "y3"];
+        const years: YearKey[] = ["y1", "y2", "y3", "y4"];
         return years
             .map((year) => ({
                 year,
@@ -90,7 +92,9 @@ export default function CoursesPage() {
                     </div>
                 </div>
 
-                {filtered.length === 0 ? (
+                {isLoading ? (
+                    <div className="py-12 text-center text-muted-foreground">Loading courses...</div>
+                ) : filtered.length === 0 ? (
                     <Empty className="border">
                         <EmptyHeader>
                             <EmptyMedia variant="icon">

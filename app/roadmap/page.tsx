@@ -20,7 +20,6 @@ import { RotateCcw, Menu, X } from "lucide-react"
 import type { YearKey, Course, SemesterKey } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 import { canPlace } from "@/lib/utils/roadmap";
-import { getCourseById } from "@/data/courses";
 
 export default function RoadMapPage() {
   const [activeYear, setActiveYear] = useState<YearKey>("y1")

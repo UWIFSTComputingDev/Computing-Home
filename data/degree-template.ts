@@ -4,6 +4,7 @@ export const emptyRoadmap: Roadmap = {
   y1: { s1: [], s2: [], s3: [] },
   y2: { s1: [], s2: [], s3: [] },
   y3: { s1: [], s2: [], s3: [] },
+  y4: { s1: [], s2: [], s3: [] },
 }
 
 export const defaultRoadmap: Roadmap = {
@@ -21,5 +22,10 @@ export const defaultRoadmap: Roadmap = {
     s1: ["cs301", "cs302", "cs303", "phil201"],
     s2: ["cs304", "cs305", "cs401"],
     s3: ["cs402"],
+  },
+  y4: {
+    s1: [],
+    s2: [],
+    s3: [],
   },
 }

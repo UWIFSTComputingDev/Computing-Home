@@ -30,11 +30,12 @@ type CurrentUser = {
 
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "About Us", href: "/about" },
-  { name: "RoadMap", href: "/tree" },
-  { name: "Degree Planner", href: "/roadmap" },
-  { name: "Dept. Book", href: "/dept-book" },
+  { name: "About", href: "/about" },
+  { name: "Roadmap", href: "/tree" },
+  { name: "Planner", href: "/roadmap" },
+  { name: "Book", href: "/dept-book" },
   { name: "Courses", href: "/courses" },
+  { name: "Rooms", href: "/classrooms" },
 ]
 
 function isNavActive(pathname: string, href: string) {
@@ -177,8 +178,8 @@ export function Navbar() {
                     key={link.href}
                     href={link.href}
                     className={`block rounded-lg px-3 py-2 text-base font-medium transition-colors ${isActive
-                        ? "bg-linear-to-r from-(--primary-color) to-(--accent-color) text-white"
-                        : "text-(--muted) hover:bg-(--bg) hover:text-(--text)"
+                      ? "bg-linear-to-r from-(--primary-color) to-(--accent-color) text-white"
+                      : "text-(--muted) hover:bg-(--bg) hover:text-(--text)"
                       }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >

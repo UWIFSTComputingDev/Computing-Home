@@ -34,7 +34,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { getCourseById } from "@/data/courses";
+import { useCourses } from "@/hooks/use-courses";
 
 type ModerationStatus = "pending" | "approved" | "rejected";
 type StatusFilter = "all" | ModerationStatus;
@@ -76,15 +76,6 @@ function formatDate(value: string) {
     return new Date(value).toLocaleDateString();
 }
 
-function courseBadgeLabel(courseId: string) {
-    return getCourseById(courseId)?.code ?? courseId;
-}
-
-function courseDisplayName(courseId: string) {
-    const course = getCourseById(courseId);
-    return course ? `${course.code} — ${course.name}` : courseId;
-}
-
 export default function SubmissionsPage() {
     const { toast } = useToast();
     const [submissions, setSubmissions] = useState<Submission[] | null>(null);
@@ -94,6 +85,16 @@ export default function SubmissionsPage() {
     const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const [rejectionReason, setRejectionReason] = useState("");
     const [busy, setBusy] = useState(false);
+    const { courses } = useCourses();
+
+    function courseBadgeLabel(courseId: string) {
+        return courses.find((course) => course.id === courseId)?.code ?? courseId;
+    }
+
+    function courseDisplayName(courseId: string) {
+        const course = courses.find((item) => item.id === courseId);
+        return course ? `${course.code} — ${course.name}` : courseId;
+    }
 
     async function loadData() {
         try {
@@ -377,81 +378,81 @@ export default function SubmissionsPage() {
                         filteredAnswers.map((answer) => {
                             const question = questionById.get(answer.questionId);
                             return (
-                            <Card key={answer.id}>
-                                <CardContent className="space-y-4 pt-6">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <Badge variant="outline">Answer</Badge>
-                                        <Badge variant="outline">
-                                            {question ? courseBadgeLabel(question.courseId) : "Unknown course"}
-                                        </Badge>
-                                        <Badge variant={statusVariant(answer.status)}>{answer.status}</Badge>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-medium">
-                                            Question: {question?.title ?? "Unknown question"}
-                                        </p>
-                                        <p className="my-2 line-clamp-2 text-sm text-muted-foreground">
-                                            {answer.content}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            By {answer.author} • {formatDate(answer.createdAt)}
-                                        </p>
-                                    </div>
-                                    {answer.rejectionReason && (
-                                        <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                                            Rejection reason: {answer.rejectionReason}
-                                        </p>
-                                    )}
-                                    <div className="flex flex-wrap gap-2">
-                                        <Button variant="outline" size="sm" onClick={() => setViewItem(answer)}>
-                                            <Eye />
-                                            View
-                                        </Button>
-                                        {answer.status === "pending" && (
-                                            <>
-                                                <Button
-                                                    size="sm"
-                                                    disabled={busy}
-                                                    onClick={() => handleApprove("answer", answer.id)}
-                                                >
-                                                    <CheckCircle2 />
-                                                    Approve
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    variant="destructive"
-                                                    disabled={busy}
-                                                    onClick={() =>
-                                                        setPendingAction({
-                                                            type: "reject",
-                                                            kind: "answer",
-                                                            id: answer.id,
-                                                        })
-                                                    }
-                                                >
-                                                    <XCircle />
-                                                    Reject
-                                                </Button>
-                                            </>
+                                <Card key={answer.id}>
+                                    <CardContent className="space-y-4 pt-6">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <Badge variant="outline">Answer</Badge>
+                                            <Badge variant="outline">
+                                                {question ? courseBadgeLabel(question.courseId) : "Unknown course"}
+                                            </Badge>
+                                            <Badge variant={statusVariant(answer.status)}>{answer.status}</Badge>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-medium">
+                                                Question: {question?.title ?? "Unknown question"}
+                                            </p>
+                                            <p className="my-2 line-clamp-2 text-sm text-muted-foreground">
+                                                {answer.content}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                By {answer.author} • {formatDate(answer.createdAt)}
+                                            </p>
+                                        </div>
+                                        {answer.rejectionReason && (
+                                            <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                                                Rejection reason: {answer.rejectionReason}
+                                            </p>
                                         )}
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            disabled={busy}
-                                            onClick={() =>
-                                                setPendingAction({
-                                                    type: "delete",
-                                                    kind: "answer",
-                                                    id: answer.id,
-                                                })
-                                            }
-                                        >
-                                            <Trash2 />
-                                            Delete
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                        <div className="flex flex-wrap gap-2">
+                                            <Button variant="outline" size="sm" onClick={() => setViewItem(answer)}>
+                                                <Eye />
+                                                View
+                                            </Button>
+                                            {answer.status === "pending" && (
+                                                <>
+                                                    <Button
+                                                        size="sm"
+                                                        disabled={busy}
+                                                        onClick={() => handleApprove("answer", answer.id)}
+                                                    >
+                                                        <CheckCircle2 />
+                                                        Approve
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        disabled={busy}
+                                                        onClick={() =>
+                                                            setPendingAction({
+                                                                type: "reject",
+                                                                kind: "answer",
+                                                                id: answer.id,
+                                                            })
+                                                        }
+                                                    >
+                                                        <XCircle />
+                                                        Reject
+                                                    </Button>
+                                                </>
+                                            )}
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                disabled={busy}
+                                                onClick={() =>
+                                                    setPendingAction({
+                                                        type: "delete",
+                                                        kind: "answer",
+                                                        id: answer.id,
+                                                    })
+                                                }
+                                            >
+                                                <Trash2 />
+                                                Delete
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             );
                         })
                     )}

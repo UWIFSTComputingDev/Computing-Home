@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react"
-import { LayoutDashboard, Users, UserCog, Settings, MessageSquare } from "lucide-react"
+import { LayoutDashboard, Users, UserCog, Settings, MessageSquare, House, BookOpen } from "lucide-react"
 
 export interface AdminNavItem {
     label: string
@@ -19,13 +19,22 @@ export const adminNavSections: AdminNavSection[] = [
     },
     {
         title: "Moderation",
-        items: [{ label: "Course Submissions", href: "/admin/submissions", icon: MessageSquare }],
+        items: [
+            { label: "Courses", href: "/admin/courses", icon: BookOpen },
+            { label: "Course Submissions", href: "/admin/submissions", icon: MessageSquare },
+        ],
     },
     {
         title: "People",
         items: [
             { label: "Users", href: "/admin/users", icon: Users },
             { label: "Committee Members", href: "/admin/committee-members", icon: UserCog },
+        ],
+    },
+    {
+        title: "Places",
+        items: [
+            { label: "Classrooms", href: "/admin/classrooms", icon: House },
         ],
     },
     {

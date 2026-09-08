@@ -81,34 +81,49 @@ export const submissionTypeEnum = pgEnum("submission_type", ["advice", "question
 export type SubmissionStatus = (typeof submissionStatusEnum.enumValues)[number];
 export type SubmissionType = (typeof submissionTypeEnum.enumValues)[number];
 
+export const courses = pgTable("courses", {
+    id: text("id").primaryKey(),
+    code: text("code").notNull().unique(),
+    name: text("name").notNull(),
+    credits: integer("credits").notNull(),
+    year: text("year").notNull(),
+    offered: jsonb("offered").$type<string[]>().notNull(),
+    prereqs: jsonb("prereqs").$type<string[]>().notNull().default([]),
+    degrees: jsonb("degrees").$type<string[]>().notNull(),
+    description: text("description"),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (courses) => [
+    index("courses_year_idx").on(courses.year),
+]).enableRLS();
+
 // Advice and Questions submissions table
 // Both advice and questions use this table, differentiated by the "type" field
 export const submissions = pgTable("submissions", {
     id: uuid("id").primaryKey().defaultRandom(),
-    
+
     // Author identification: one of these will be set
     userId: uuid("user_id")
         .references(() => users.id, { onDelete: "cascade" }),
     anonymousAuthorName: text("anonymous_author_name"),
-    
-    // Course reference (references course.id from data/courses.ts)
-    courseId: text("course_id").notNull(),
-    
+
+    // Course reference
+    courseId: text("course_id").notNull().references(() => courses.id, { onDelete: "restrict" }),
+
     // Content type: "advice" or "question"
     type: submissionTypeEnum("type").notNull(),
-    
+
     // Content fields
     title: text("title").notNull(),
     content: text("content").notNull(),
-    
+
     // Moderation status: "pending" | "approved" | "rejected"
     status: submissionStatusEnum("status").notNull().default("pending"),
     rejectionReason: text("rejection_reason"),
-    
+
     // Moderation timestamps
     approvedAt: timestamp("approved_at", { withTimezone: true }),
     rejectedAt: timestamp("rejected_at", { withTimezone: true }),
-    
+
     // Standard timestamps
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
@@ -121,31 +136,47 @@ export const submissions = pgTable("submissions", {
 // Only questions (submissions with type="question") can receive answers
 export const answers = pgTable("answers", {
     id: uuid("id").primaryKey().defaultRandom(),
-    
+
     // Reference to the question (submission with type="question")
     questionId: uuid("question_id")
         .notNull()
         .references(() => submissions.id, { onDelete: "cascade" }),
-    
+
     // Author identification: one of these will be set
     userId: uuid("user_id")
         .references(() => users.id, { onDelete: "cascade" }),
     anonymousAuthorName: text("anonymous_author_name"),
-    
+
     // Answer content
     content: text("content").notNull(),
-    
+
     // Moderation status: "pending" | "approved" | "rejected"
     status: submissionStatusEnum("status").notNull().default("pending"),
     rejectionReason: text("rejection_reason"),
-    
+
     // Moderation timestamps
     approvedAt: timestamp("approved_at", { withTimezone: true }),
     rejectedAt: timestamp("rejected_at", { withTimezone: true }),
-    
+
     // Standard timestamps
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 }, (answers) => [
     index("answers_question_status_idx").on(answers.questionId, answers.status),
+]).enableRLS();
+
+
+// Classrooms
+export const classrooms = pgTable("classrooms", {
+    code: text("code").primaryKey(),
+
+    // Full name of Room
+    title: text("title").notNull().default(""),
+
+    directions: text("directions").notNull().default(""),
+
+    // Standard timestamps
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (classrooms) => [
+    index("classrooms_code_idx").on(classrooms.code, classrooms.title, classrooms.directions),
 ]).enableRLS();

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { submissions } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth";
-import { courses } from "@/data/courses";
+import { getCourseById } from "@/lib/courses";
 
 const createSubmissionSchema = z.object({
     courseId: z.string().min(1, "Course is required."),
@@ -28,9 +28,7 @@ export async function POST(request: NextRequest) {
 
     const { courseId, type, title, content, anonymousAuthorName } = parsed.data;
 
-    // Validate course exists in data/courses.ts
-    const courseExists = courses.some((course) => course.id === courseId);
-    if (!courseExists) {
+    if (!(await getCourseById(courseId))) {
         return NextResponse.json({ error: "Invalid course." }, { status: 400 });
     }
 

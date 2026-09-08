@@ -15,6 +15,13 @@
       "when": 1788141991218,
       "tag": "0001_thick_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788841186998,
+      "tag": "0002_glorious_thunderball",
+      "breakpoints": true
     }
   ]
 }

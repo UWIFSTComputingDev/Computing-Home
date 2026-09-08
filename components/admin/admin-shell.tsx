@@ -10,7 +10,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
     return (
-        <div className="min-h-screen">
+        <div data-admin-shell className="min-h-screen">
             <AdminSidebar />
             <AdminMobileSidebar open={mobileNavOpen} onOpenChange={setMobileNavOpen} />
             <div className="flex min-h-screen flex-col md:pl-64">

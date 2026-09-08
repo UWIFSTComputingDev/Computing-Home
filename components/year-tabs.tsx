@@ -11,6 +11,7 @@ const years: { key: YearKey; label: string }[] = [
   { key: "y1", label: "Year 1" },
   { key: "y2", label: "Year 2" },
   { key: "y3", label: "Year 3" },
+  { key: "y4", label: "Year 4" },
 ]
 
 export function YearTabs({ active, onChange }: YearTabsProps) {
@@ -20,11 +21,10 @@ export function YearTabs({ active, onChange }: YearTabsProps) {
         <button
           key={year.key}
           onClick={() => onChange(year.key)}
-          className={`px-6 py-3 font-medium transition-all ${
-            active === year.key
+          className={`px-6 py-3 font-medium transition-all ${active === year.key
               ? "border-b-2 border-[color:var(--primary-color)] text-[color:var(--primary-color)]"
               : "text-[color:var(--muted)] hover:text-[color:var(--text)]"
-          }`}
+            }`}
         >
           {year.label}
         </button>
