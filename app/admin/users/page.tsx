@@ -56,6 +56,7 @@ interface AdminUserRow {
 }
 
 type PendingAction =
+    | { type: "role"; user: AdminUserRow; nextRole: "user" | "admin" }
     | { type: "ban"; user: AdminUserRow }
     | { type: "unban"; user: AdminUserRow }
     | { type: "delete"; user: AdminUserRow }
@@ -99,19 +100,16 @@ export default function AdminUsersPage() {
         return true
     }
 
-    async function handleRoleChange(user: AdminUserRow) {
-        const nextRole = user.role === "admin" ? "user" : "admin"
-        const ok = await updateUser(user.id, { role: nextRole })
-        if (ok) {
-            toast({ title: `${user.displayName ?? user.email} is now ${nextRole}` })
-        }
-    }
-
     async function confirmAction() {
         if (!pendingAction) return
         setBusy(true)
         try {
-            if (pendingAction.type === "ban") {
+            if (pendingAction.type === "role") {
+                const ok = await updateUser(pendingAction.user.id, { role: pendingAction.nextRole })
+                if (ok) {
+                    toast({ title: `${pendingAction.user.displayName ?? pendingAction.user.email} is now ${pendingAction.nextRole}` })
+                }
+            } else if (pendingAction.type === "ban") {
                 const ok = await updateUser(pendingAction.user.id, { banned: true, bannedReason: banReason || null })
                 if (ok) toast({ title: `${pendingAction.user.displayName ?? pendingAction.user.email} has been banned.` })
             } else if (pendingAction.type === "unban") {
@@ -211,7 +209,13 @@ export default function AdminUsersPage() {
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem
                                                         disabled={user.id === currentUserId}
-                                                        onClick={() => handleRoleChange(user)}
+                                                        onClick={() =>
+                                                            setPendingAction({
+                                                                type: "role",
+                                                                user,
+                                                                nextRole: user.role === "admin" ? "user" : "admin",
+                                                            })
+                                                        }
                                                     >
                                                         <ShieldCheck className="mr-2 size-4" />
                                                         {user.role === "admin" ? "Demote to user" : "Promote to admin"}
@@ -254,11 +258,15 @@ export default function AdminUsersPage() {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
+                            {pendingAction?.type === "role" &&
+                                `${pendingAction.nextRole === "admin" ? "Promote" : "Demote"} user`}
                             {pendingAction?.type === "ban" && "Ban user"}
                             {pendingAction?.type === "unban" && "Unban user"}
                             {pendingAction?.type === "delete" && "Remove user"}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
+                            {pendingAction?.type === "role" &&
+                                `${pendingAction.user.displayName ?? pendingAction.user.email} will ${pendingAction.nextRole === "admin" ? "be given" : "lose"} administrator access.`}
                             {pendingAction?.type === "ban" &&
                                 `This will immediately sign out ${pendingAction.user.displayName ?? pendingAction.user.email} and block them from logging in.`}
                             {pendingAction?.type === "unban" &&

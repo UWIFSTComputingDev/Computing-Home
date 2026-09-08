@@ -30,6 +30,10 @@ function normalizeDegree(value: string) {
     return value.replace(/\s+/g, "").toUpperCase();
 }
 
+function sanitizePrerequisites(value: string) {
+    return value.replace(/[^a-zA-Z0-9,]/g, "");
+}
+
 export default function CoursesAdminPage() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
@@ -67,11 +71,13 @@ function CourseForm({ course, setCourses }: { course?: Course; setCourses: React
     const { toast } = useToast();
     const [otherDegree, setOtherDegree] = useState(() => (course?.degrees ?? []).find((degree) => !degrees.includes(degree)) ?? "");
     const [otherDegreeEnabled, setOtherDegreeEnabled] = useState(() => Boolean((course?.degrees ?? []).find((degree) => !degrees.includes(degree))));
+    const [prereqInput, setPrereqInput] = useState((course?.prereqs ?? []).join(","));
 
     useEffect(() => {
         setForm(course ? { ...course, code: normalizeCode(course.code), id: normalizeCode(course.id), degrees: course.degrees.map(normalizeDegree) } : emptyCourse);
         setOtherDegree((course?.degrees ?? []).find((degree) => !degrees.includes(normalizeDegree(degree))) ?? "");
         setOtherDegreeEnabled(Boolean((course?.degrees ?? []).find((degree) => !degrees.includes(normalizeDegree(degree)))));
+        setPrereqInput((course?.prereqs ?? []).join(","));
     }, [course, open]);
 
     async function save() {
@@ -80,7 +86,8 @@ function CourseForm({ course, setCourses }: { course?: Course; setCourses: React
             const code = normalizeCode(form.code);
             const selectedDegrees = form.degrees.filter((degree) => degrees.includes(degree));
             const normalizedOtherDegree = otherDegreeEnabled ? normalizeDegree(otherDegree) : "";
-            const response = await fetch("/api/courses", { method: course ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, originalId: course?.id, id: code, code, name: form.name.trim(), degrees: [...selectedDegrees, ...(normalizedOtherDegree ? [normalizedOtherDegree] : [])], prereqs: (form.prereqs ?? []).map(normalizeCode).filter(Boolean), description: form.description?.trim() || null }) });
+            const prereqs = prereqInput.split(",").map(normalizeCode).filter(Boolean);
+            const response = await fetch("/api/courses", { method: course ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, originalId: course?.id, id: code, code, name: form.name.trim(), degrees: [...selectedDegrees, ...(normalizedOtherDegree ? [normalizedOtherDegree] : [])], prereqs, description: form.description?.trim() || null }) });
             const data = await response.json().catch(() => ({}));
             if (!response.ok) throw new Error(data.error ?? "Unable to save course.");
             setCourses((current) => course ? current.map((item) => item.id === course.id ? data.course : item) : [...current, data.course]);
@@ -134,7 +141,7 @@ function CourseForm({ course, setCourses }: { course?: Course; setCourses: React
 
                 <div className="space-y-2">
                     <Label htmlFor="course-prereqs">Prerequisites</Label>
-                    <Input id="course-prereqs" className="uppercase" placeholder="Course codes separated by commas" value={(form.prereqs ?? []).join(", ")} onChange={(event) => update("prereqs", event.target.value.split(",").map(normalizeCode).filter(Boolean))} />
+                    <Input id="course-prereqs" className="uppercase" placeholder="Course codes separated by commas" value={prereqInput} onChange={(event) => setPrereqInput(sanitizePrerequisites(event.target.value))} />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="course-description">Description</Label>

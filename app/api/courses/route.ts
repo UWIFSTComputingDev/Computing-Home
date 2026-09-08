@@ -10,6 +10,7 @@ import { requireRole } from "@/lib/auth";
 
 const normalizeCode = (value: string) => value.replace(/\s+/g, "").toUpperCase();
 const normalizeDegree = (value: string) => value.replace(/\s+/g, "").toUpperCase();
+const prerequisiteCode = z.string().transform(normalizeCode).pipe(z.string().regex(/^[A-Z0-9]+$/, "Prerequisites may only contain letters and numbers."));
 
 const courseSchema = z.object({
     id: z.string().transform(normalizeCode).pipe(z.string().min(1).max(30)),
@@ -18,7 +19,7 @@ const courseSchema = z.object({
     credits: z.number().int().positive().max(30),
     year: z.enum(["y1", "y2", "y3", "y4"]),
     offered: z.array(z.enum(["s1", "s2", "s3"])).min(1),
-    prereqs: z.array(z.string().transform(normalizeCode).pipe(z.string().min(1).max(30))).default([]),
+    prereqs: z.array(prerequisiteCode.pipe(z.string().min(1).max(30))).default([]),
     degrees: z.array(z.string().transform(normalizeDegree).pipe(z.string().min(1).max(30))).min(1),
     description: z.string().trim().max(5000).nullable().optional(),
 });
