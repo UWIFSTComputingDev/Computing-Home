@@ -23,11 +23,12 @@ export function AdminNavList({ onNavigate }: { onNavigate?: () => void }) {
                                 key={item.href}
                                 href={item.href}
                                 onClick={onNavigate}
+                                aria-current={isActive ? "page" : undefined}
                                 className={cn(
-                                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                                    "flex items-center gap-3 rounded-lg border-l-2 px-3 py-2.5 text-sm font-medium transition-colors",
                                     isActive
-                                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                                        : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                                        ? "border-sidebar-primary bg-sidebar-accent text-sidebar-accent-foreground"
+                                        : "border-transparent text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                                 )}
                             >
                                 <Icon className="size-4" />

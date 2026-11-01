@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { MoreHorizontal, ShieldCheck, ShieldOff, Trash2, Users } from "lucide-react"
+import { MoreHorizontal, Search, ShieldCheck, ShieldOff, Trash2, Users } from "lucide-react"
 
 import {
     Empty,
@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
 
 interface AdminUserRow {
     id: string
@@ -140,12 +141,12 @@ export default function AdminUsersPage() {
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-2xl font-semibold">Users</h1>
-                <p className="text-sm text-muted-foreground">
-                    Manage accounts and permissions for the department portal.
-                </p>
-            </div>
+            <AdminPageHeader
+                section="People"
+                title="Users"
+                description="Find accounts, review access, and manage roles and account status."
+                icon={Users}
+            />
 
             {users === null ? (
                 <div className="flex justify-center py-12">
@@ -159,19 +160,48 @@ export default function AdminUsersPage() {
                         </EmptyMedia>
                         <EmptyTitle>No users yet</EmptyTitle>
                         <EmptyDescription>
-                            Once user management is wired up, accounts will be listed here.
+                            There are no accounts to manage yet.
                         </EmptyDescription>
                     </EmptyHeader>
                 </Empty>
             ) : (
-                <div className="flex flex-col gap-4">
-                    <Input
-                        placeholder="Search by name or email..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="max-w-sm"
-                    />
-                    <div className="rounded-md border overflow-x-auto">
+                <section className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
+                    <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                        <div>
+                            <h2 className="font-semibold">Portal accounts</h2>
+                            <p className="mt-1 text-sm text-muted-foreground">{filtered?.length ?? 0} matching {filtered?.length === 1 ? "account" : "accounts"}</p>
+                        </div>
+                        <div className="relative w-full sm:max-w-xs">
+                            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                aria-label="Search users by name or email"
+                                placeholder="Search users..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="pl-9"
+                            />
+                        </div>
+                    </div>
+                    <div className="space-y-3 p-3 md:hidden">
+                        {filtered?.map((user) => (
+                            <article key={user.id} className="rounded-xl border border-border/70 bg-background p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <p className="truncate font-semibold">{user.displayName ?? "Unnamed user"}</p>
+                                        <p className="mt-1 break-all text-sm text-muted-foreground">{user.email}</p>
+                                    </div>
+                                    <UserActionsMenu user={user} currentUserId={currentUserId} onAction={setPendingAction} />
+                                </div>
+                                <div className="mt-3 flex flex-wrap items-center gap-2">
+                                    <Badge variant={user.role === "admin" ? "default" : "outline"}>{user.role}</Badge>
+                                    <Badge variant={user.banned ? "destructive" : "secondary"}>{user.banned ? "Banned" : "Active"}</Badge>
+                                    {user.position && <Badge variant="outline">{user.position}</Badge>}
+                                </div>
+                            </article>
+                        ))}
+                        {filtered?.length === 0 && <p className="px-3 py-8 text-center text-sm text-muted-foreground">No users match this search.</p>}
+                    </div>
+                    <div className="hidden overflow-x-auto md:block">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -200,58 +230,14 @@ export default function AdminUsersPage() {
                                         </TableCell>
                                         <TableCell className="text-muted-foreground">{user.position ?? "—"}</TableCell>
                                         <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" aria-label="User actions">
-                                                        <MoreHorizontal className="size-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem
-                                                        disabled={user.id === currentUserId}
-                                                        onClick={() =>
-                                                            setPendingAction({
-                                                                type: "role",
-                                                                user,
-                                                                nextRole: user.role === "admin" ? "user" : "admin",
-                                                            })
-                                                        }
-                                                    >
-                                                        <ShieldCheck className="mr-2 size-4" />
-                                                        {user.role === "admin" ? "Demote to user" : "Promote to admin"}
-                                                    </DropdownMenuItem>
-                                                    {user.banned ? (
-                                                        <DropdownMenuItem onClick={() => setPendingAction({ type: "unban", user })}>
-                                                            <ShieldCheck className="mr-2 size-4" />
-                                                            Unban user
-                                                        </DropdownMenuItem>
-                                                    ) : (
-                                                        <DropdownMenuItem
-                                                            disabled={user.id === currentUserId}
-                                                            variant="destructive"
-                                                            onClick={() => setPendingAction({ type: "ban", user })}
-                                                        >
-                                                            <ShieldOff className="mr-2 size-4" />
-                                                            Ban user
-                                                        </DropdownMenuItem>
-                                                    )}
-                                                    <DropdownMenuItem
-                                                        disabled={user.id === currentUserId}
-                                                        variant="destructive"
-                                                        onClick={() => setPendingAction({ type: "delete", user })}
-                                                    >
-                                                        <Trash2 className="mr-2 size-4" />
-                                                        Remove user
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <UserActionsMenu user={user} currentUserId={currentUserId} onAction={setPendingAction} />
                                         </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
                     </div>
-                </div>
+                </section>
             )}
 
             <AlertDialog open={pendingAction !== null} onOpenChange={(open) => !open && setPendingAction(null)}>
@@ -291,5 +277,61 @@ export default function AdminUsersPage() {
                 </AlertDialogContent>
             </AlertDialog>
         </div>
+    )
+}
+
+function UserActionsMenu({
+    user,
+    currentUserId,
+    onAction,
+}: {
+    user: AdminUserRow
+    currentUserId: string | null
+    onAction: (action: PendingAction) => void
+}) {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label={`Actions for ${user.displayName ?? user.email}`}>
+                    <MoreHorizontal className="size-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                    disabled={user.id === currentUserId}
+                    onClick={() => onAction({
+                        type: "role",
+                        user,
+                        nextRole: user.role === "admin" ? "user" : "admin",
+                    })}
+                >
+                    <ShieldCheck className="mr-2 size-4" />
+                    {user.role === "admin" ? "Demote to user" : "Promote to admin"}
+                </DropdownMenuItem>
+                {user.banned ? (
+                    <DropdownMenuItem onClick={() => onAction({ type: "unban", user })}>
+                        <ShieldCheck className="mr-2 size-4" />
+                        Unban user
+                    </DropdownMenuItem>
+                ) : (
+                    <DropdownMenuItem
+                        disabled={user.id === currentUserId}
+                        variant="destructive"
+                        onClick={() => onAction({ type: "ban", user })}
+                    >
+                        <ShieldOff className="mr-2 size-4" />
+                        Ban user
+                    </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                    disabled={user.id === currentUserId}
+                    variant="destructive"
+                    onClick={() => onAction({ type: "delete", user })}
+                >
+                    <Trash2 className="mr-2 size-4" />
+                    Remove user
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }

@@ -17,7 +17,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-(--card) mt-auto">
+    <footer className="mt-auto border-t border-border bg-(--card)/70 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-2">
           {/* Useful Links */}
@@ -60,7 +60,7 @@ export function Footer() {
 
         <div className="mt-8 border-t border-border pt-6 text-center">
           <p className="text-sm text-(--muted)">
-            © {new Date().getFullYear()} Computer Science Department. All rights reserved.
+            © {new Date().getFullYear()} Computing Department. All rights reserved.
           </p>
         </div>
       </div>

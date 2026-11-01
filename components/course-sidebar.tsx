@@ -44,7 +44,7 @@ export function CourseSidebar() {
   };
 
   return (
-    <div className="flex h-full flex-col gap-4 rounded-xl border border-[color:var(--border-color)] bg-[color:var(--card)] p-4">
+    <div className="flex h-full flex-col gap-4 rounded-xl border border-[color:var(--border-color)] bg-[color:var(--card)]/70 p-4 backdrop-blur-xl lg:bg-[color:var(--card)] lg:backdrop-blur-none">
       <div>
         <h3 className="mb-3 text-lg font-bold text-[color:var(--text)]">Courses</h3>
         <div className="relative">

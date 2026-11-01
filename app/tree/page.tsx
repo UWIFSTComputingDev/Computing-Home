@@ -93,14 +93,14 @@ export default function RoadmapPage() {
     <div className="flex min-h-screen flex-col">
       <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto w-full">
         {/* Degree Selection Sub-Menu */}
-        <div className="flex justify-center flex-wrap gap-4 mb-4 border-b border-[color:var(--border-color)] pb-6">
+        <div className="flex justify-center flex-wrap gap-4 mb-4 border-b border-border pb-6">
           {degreeOptions.map((option) => (
             <button
               key={option.key}
               onClick={() => setSelectedDegree(option.key)}
               className={`px-6 py-2 text-sm font-semibold rounded-full transition-all duration-200 ${selectedDegree === option.key
-                ? "bg-[color:var(--primary-color)] text-white shadow-lg scale-105"
-                : "bg-[color:var(--card)] text-[color:var(--text)] hover:bg-[color:var(--border-color)] border border-[color:var(--border-color)]"
+                ? "bg-primary text-white shadow-lg scale-105"
+                : "bg-(--card) text-(--text) hover:bg-border border border-border"
                 }`}
             >
               {option.label}
@@ -115,8 +115,8 @@ export default function RoadmapPage() {
               key={option.key}
               onClick={() => setSelectedYear(option.key)}
               className={`px-5 py-1.5 text-xs font-bold rounded-full border transition-all ${selectedYear === option.key
-                ? "bg-[color:var(--primary-color)] border-[color:var(--primary-color)] text-white"
-                : "bg-transparent border-[color:var(--border-color)] text-[color:var(--muted)] hover:border-[color:var(--primary-color)]"
+                ? "bg-primary border-primary text-white"
+                : "bg-transparent border-border text-(--muted) hover:border-primary"
                 }`}
             >
               {option.label}
@@ -124,7 +124,7 @@ export default function RoadmapPage() {
           ))}
         </div>
 
-        <h1 className="text-4xl font-extrabold tracking-tight text-[color:var(--text)] text-center mb-16">
+        <h1 className="text-4xl font-extrabold tracking-tight text-(--text) text-center mb-16">
           {currentDegreeLabel} Roadmap
         </h1>
 
@@ -133,11 +133,11 @@ export default function RoadmapPage() {
 
           {/* SEMESTER 1 COLUMN */}
           <div className="flex flex-col gap-6">
-            <div className="flex items-center justify-between border-b-4 border-[color:var(--primary-color)] pb-3">
-              <h2 className="text-2xl font-black uppercase text-[color:var(--text)]">Semester 1</h2>
+            <div className="flex items-center justify-between border-b-4 border-primary pb-3">
+              <h2 className="text-2xl font-black uppercase text-(--text)">Semester 1</h2>
               <div className="text-right">
-                <span className="text-[10px] font-bold text-[color:var(--muted)] uppercase">Credit Load</span>
-                <p className="text-sm font-bold text-[color:var(--primary-color)]">Min 15 / Max 18 Credits</p>
+                <span className="text-[10px] font-bold text-(--muted) uppercase">Credit Load</span>
+                <p className="text-sm font-bold text-primary">Min 15 / Max 18 Credits</p>
               </div>
             </div>
 
@@ -147,13 +147,13 @@ export default function RoadmapPage() {
                 .map((course) => (
                   <div
                     key={course.id}
-                    className="group relative rounded-xl border-2 border-[color:var(--border-color)] bg-[color:var(--card)] p-6 transition-all hover:border-[color:var(--primary-color)] hover:shadow-xl"
+                    className="group relative rounded-xl border-2 border-border bg-(--card) p-6 transition-all hover:border-primary hover:shadow-xl"
                   >
                     <div className="mb-3 flex items-start justify-between">
-                      <span className="rounded-md bg-[color:var(--primary-color)]/10 px-2 py-1 text-xs font-black text-[color:var(--primary-color)]">
+                      <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-black text-primary">
                         {course.code}
                       </span>
-                      <span className="text-xs font-bold text-[color:var(--muted)]">
+                      <span className="text-xs font-bold text-(--muted)">
                         {course.credits} Credits
                       </span>
                     </div>

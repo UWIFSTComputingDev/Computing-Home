@@ -1,109 +1,145 @@
-import { FeatureCard } from "@/components/feature-card"
-import { Map, BookOpen, NotebookPen, Sparkles, ArrowRight, Users, GraduationCap, Award } from "lucide-react"
-import { HomeHeroSlider } from "@/components/home-hero-slider"
+import {
+  ArrowDownRight,
+  ArrowRight,
+  Award,
+  BookOpen,
+  GraduationCap,
+  Map,
+  NotebookPen,
+  Users,
+} from "lucide-react"
 import Link from "next/link"
+
+import { FeatureCard } from "@/components/feature-card"
+import { HomeHeroSlider } from "@/components/home-hero-slider"
+
+const highlights = [
+  { icon: Users, value: "500+", label: "students in our community" },
+  { icon: GraduationCap, value: "24+", label: "credits to plan for" },
+  { icon: Award, value: "95%", label: "student success rate" },
+]
+
 export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <main className="flex-1">
-        {/* Modern Hero Section */}
-        <section className="relative overflow-hidden pt-16 pb-24 lg:pt-24 lg:pb-32">
-          {/* Animated Background Blobs from example */}
-          <div className="absolute inset-0 z-0">
-            <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
-            <div className="absolute top-40 right-10 w-72 h-72 bg-cyan-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
+    <main className="min-h-screen">
+      <section className="relative px-4 pb-14 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8 lg:pb-24 lg:pt-20">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.03fr_0.97fr] lg:gap-14">
+          <div className="relative z-10">
+            <h1 className="max-w-3xl text-5xl font-bold leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
+              Build a future in{" "}
+              <span className="bg-linear-to-r from-blue-500 via-sky-400 to-blue-600 bg-clip-text text-transparent">
+                computing.
+              </span>
+            </h1>
+
+            <p className="mt-6 max-w-xl text-lg leading-8 text-(--muted) sm:text-xl">
+              Your home for learning, planning, and finding your people in the
+              Computing Department.
+            </p>
+
+            <div className="mt-9 flex flex-wrap items-center gap-3">
+              <Link
+                href="/roadmap"
+                className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white shadow-[0_12px_30px_rgba(30,144,255,0.25)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_38px_rgba(30,144,255,0.32)]"
+              >
+                Start planning
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link
+                href="/courses"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border bg-(--card)/65 px-6 py-3 font-semibold text-(--text) shadow-sm backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-primary/35 hover:bg-(--card)"
+              >
+                Explore courses
+                <ArrowDownRight className="size-4 text-primary" />
+              </Link>
+            </div>
+
+            <div className="mt-12 grid max-w-xl grid-cols-3 gap-3">
+              {highlights.map(({ icon: Icon, value, label }) => (
+                <div
+                  key={label}
+                  className="rounded-2xl border border-white/60 bg-white/45 p-3 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] sm:p-4"
+                >
+                  <Icon className="mb-3 size-4 text-primary sm:size-5" />
+                  <p className="text-xl font-bold tracking-tight text-(--text) sm:text-2xl">
+                    {value}
+                  </p>
+                  <p className="mt-1 text-[11px] leading-4 text-(--muted) sm:text-xs">
+                    {label}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              {/* Badge with your wording */}
-              <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full mb-8 animate-fade-in border border-blue-100">
-                <Sparkles className="w-4 h-4 text-blue-600 mr-2" />
-                <span className="text-sm font-semibold text-blue-700">Explore Your Academic Journey</span>
-              </div>
-
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-(--text) mb-6 text-balance">
-                Welcome to the <br />
-                <span className="bg-linear-to-r from-blue-600 via-cyan-500 to-blue-500 bg-clip-text text-transparent">
-                  Computing Department
-                </span>
-              </h1>
-
-              <p className="mx-auto mt-6 max-w-2xl text-lg text-(--muted) leading-relaxed text-pretty">
-                Discover the resources available to help you succeed in your computer
-                science education.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                <Link href="/roadmap" className="px-8 py-4 bg-primary text-white rounded-xl font-bold shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5 transition-all flex items-center">
-                  Start Planning
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-                <Link href="/tree" className="px-8 py-4 bg-white text-gray-700 rounded-xl font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all border border-gray-100">
-                  View Roadmap
-                </Link>
-              </div>
-            </div>
-
-            {/* Quick Stats Row */}
-            <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8">
-              <div className="text-center p-6 bg-white/40 backdrop-blur-md rounded-2xl border border-white/50">
-                <Users className="w-8 h-8 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-3xl font-bold text-(--text)">500+</h3>
-                <p className="text-(--muted)">Active Students</p>
-              </div>
-              <div className="text-center p-6 bg-white/40 backdrop-blur-md rounded-2xl border border-white/50">
-                <GraduationCap className="w-8 h-8 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-3xl font-bold text-(--text)">24+</h3>
-                <p className="text-(--muted)">Level 1 Credits Needed</p>
-              </div>
-              <div className="text-center p-6 bg-white/40 backdrop-blur-md rounded-2xl border border-white/50">
-                <Award className="w-8 h-8 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-3xl font-bold text-(--text)">95%</h3>
-                <p className="text-(--muted)">Success Rate</p>
-              </div>
-            </div>
-
-            {/* Slider container is now OUTSIDE the stats grid div */}
-            <div className="mx-auto mt-16 max-w-5xl">
-              <div className="relative aspect-video overflow-hidden rounded-2xl border border-border bg-(--card) shadow-2xl">
+          <div className="relative mx-auto w-full max-w-2xl lg:max-w-none">
+            <div className="absolute -inset-5 rounded-[2.5rem] bg-linear-to-br from-blue-400/20 via-sky-300/10 to-transparent blur-2xl" />
+            <div className="relative rounded-[1.7rem] border border-white/70 bg-white/35 p-2.5 shadow-[0_32px_90px_rgba(23,78,135,0.18)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/[0.04] sm:rounded-[2rem] sm:p-3">
+              <div className="relative aspect-[1.15] overflow-hidden rounded-[1.25rem] border border-white/60 bg-(--card) shadow-inner dark:border-white/10 sm:aspect-[1.2] sm:rounded-[1.5rem]">
                 <HomeHeroSlider />
               </div>
+              <div className="flex items-center justify-between gap-4 px-2 pb-1 pt-3 sm:px-3 sm:pt-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Map className="size-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-(--text)">
+                      Your journey, mapped out
+                    </p>
+                    <p className="truncate text-xs text-(--muted)">
+                      Explore what you can build
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/tree"
+                  className="group inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-blue-700 dark:hover:text-blue-300"
+                >
+                  View roadmap
+                  <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Feature Cards Section */}
-        <section className="py-16 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center mb-12">
-            <h2 className="text-4xl font-bold text-(--text)">Everything You Need to <span className="text-blue-600">Succeed</span></h2>
-            <p className="mt-4 text-(--muted)">Access powerful tools designed to help you plan, track, and achieve your academic goals.</p>
-          </div>
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-8 md:grid-cols-3">
-              <FeatureCard
-                title="Degree Planner"
-                description="Plan your academic journey with our interactive course roadmap. Drag and drop courses to create your personalized degree plan."
-                href="/roadmap"
-                icon={NotebookPen}
-              />
-              <FeatureCard
-                title="Department Book"
-                description="Browse through our comprehensive department handbook. Learn about our programs, faculty, and research opportunities."
-                href="/dept-book"
-                icon={BookOpen}
-              />
-              <FeatureCard
-                title="Road Map"
-                description="Visualize your course dependencies and prerequisites in a clear, easy-to-navigate interface."
-                href="/tree"
-                icon={Map}
-              />
+      <section className="px-4 pb-20 pt-10 sm:px-6 sm:pb-28 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 flex flex-col gap-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="max-w-2xl text-3xl font-bold tracking-tight text-(--text) sm:text-4xl">
+                Everything you need to move forward.
+              </h2>
             </div>
+            <p className="max-w-md text-sm leading-6 text-(--muted) sm:text-base">
+              Find the tools and community to make your time in computing count.
+            </p>
           </div>
-        </section>
-      </main>
-    </div>
+
+          <div className="grid gap-5 md:grid-cols-3">
+            <FeatureCard
+              title="Degree planner"
+              description="Shape your academic journey with an interactive course planner. Build a plan that works for you."
+              href="/roadmap"
+              icon={NotebookPen}
+            />
+            <FeatureCard
+              title="Department book"
+              description="Get to know our programs, faculty, student community, and opportunities."
+              href="/dept-book"
+              icon={BookOpen}
+            />
+            <FeatureCard
+              title="Course roadmap"
+              description="See how courses connect and explore the prerequisites behind your degree."
+              href="/tree"
+              icon={Map}
+            />
+          </div>
+        </div>
+      </section>
+    </main>
   )
 }

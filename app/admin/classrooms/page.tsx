@@ -6,13 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Classroom } from "@/lib/types";
-import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { Building2, Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 
 
 export default function ClassroomsPage() {
     const [classrooms, setClassrooms] = useState<Classroom[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         const fetchClassrooms = async () => {
@@ -27,45 +29,81 @@ export default function ClassroomsPage() {
         fetchClassrooms();
     }, []);
 
-    return (<div className="flex flex-col">
-        <div className="flex justify-between bg-background dark:bg-background/20 py-8 px-4">
-            <h2 className="text-lg font-bold">Classrooms</h2>
-            <AddClassroom setClassrooms={setClassrooms} />
-        </div>
+    const visibleClassrooms = classrooms.filter((room) => {
+        const query = search.trim().toLowerCase();
+        return !query || [room.code, room.title, room.directions].some((value) => value.toLowerCase().includes(query));
+    });
 
-        <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default">
-            <table className="w-full text-sm text-left rtl:text-right text-body">
-                <thead className="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default">
-                    <tr>
-                        <th scope="col" className="px-6 py-3 font-medium">
-                            Title
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-medium">
-                            Name on Timetable
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-medium">
-                            Description/Location
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-right font-medium">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {isLoading ? <tr><td colSpan={4} className="px-6 py-8 text-center"><Loader2 className="mx-auto size-5 animate-spin" aria-label="Loading classrooms" /></td></tr> : classrooms.length === 0 ? <tr><td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">No classrooms found.</td></tr> : classrooms.map(classroom => <tr key={classroom.code} className="bg-neutral-primary border-b border-default">
-                        <th scope="row" className="px-6 py-4 font-medium text-heading whitespace-nowrap">
-                            {classroom.title}
-                        </th>
-                        <td className="px-6 py-4">
-                            {classroom.code}
-                        </td>
-                        <td className="px-6 py-4">
-                            {classroom.directions}
-                        </td>
-                        <td className="px-6 py-4"><div className="flex justify-end gap-2"><EditClassroom classroom={classroom} setClassrooms={setClassrooms} /><DeleteClassroom classroom={classroom} setClassrooms={setClassrooms} /></div></td>
-                    </tr>)}
-                </tbody>
-            </table>
+    return (
+        <div className="flex flex-col gap-6">
+            <AdminPageHeader
+                section="Places"
+                title="Classrooms"
+                description="Keep timetable names, room titles, and location guidance up to date."
+                icon={Building2}
+                action={<AddClassroom setClassrooms={setClassrooms} />}
+            />
+            <section className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
+                <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                    <div>
+                        <h2 className="font-semibold">Room directory</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">{visibleClassrooms.length} of {classrooms.length} rooms</p>
+                    </div>
+                    <div className="relative w-full sm:max-w-xs">
+                        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input aria-label="Search classrooms" placeholder="Search rooms..." value={search} onChange={(event) => setSearch(event.target.value)} className="pl-9" />
+                    </div>
+                </div>
+                {isLoading ? (
+                    <div className="flex justify-center py-14"><Loader2 className="size-5 animate-spin text-muted-foreground" aria-label="Loading classrooms" /></div>
+                ) : classrooms.length === 0 ? (
+                    <p className="px-6 py-12 text-center text-sm text-muted-foreground">No classrooms found. Add the first room to the directory.</p>
+                ) : visibleClassrooms.length === 0 ? (
+                    <p className="px-6 py-12 text-center text-sm text-muted-foreground">No classrooms match your search.</p>
+                ) : (
+                    <>
+                        <div className="space-y-3 p-3 md:hidden">
+                            {visibleClassrooms.map((classroom) => (
+                                <article key={classroom.code} className="rounded-xl border border-border/70 bg-background p-4">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <h3 className="font-semibold">{classroom.title}</h3>
+                                            <p className="mt-1 text-xs font-medium uppercase tracking-wide text-primary">{classroom.code}</p>
+                                        </div>
+                                        <div className="flex shrink-0 gap-1">
+                                            <EditClassroom classroom={classroom} setClassrooms={setClassrooms} />
+                                            <DeleteClassroom classroom={classroom} setClassrooms={setClassrooms} />
+                                        </div>
+                                    </div>
+                                    <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{classroom.directions}</p>
+                                </article>
+                            ))}
+                        </div>
+                        <div className="hidden overflow-x-auto md:block">
+                            <table className="w-full text-left text-sm">
+                                <thead className="border-b bg-muted/40 text-muted-foreground"><tr>
+                                    <th className="px-5 py-3 font-medium">Room</th>
+                                    <th className="px-5 py-3 font-medium">Timetable name</th>
+                                    <th className="px-5 py-3 font-medium">Location details</th>
+                                    <th className="px-5 py-3 text-right font-medium">Actions</th>
+                                </tr></thead>
+                                <tbody>
+                                    {visibleClassrooms.map((classroom) => (
+                                        <tr key={classroom.code} className="border-b last:border-0 hover:bg-muted/20">
+                                            <td className="px-5 py-4 font-semibold">{classroom.title}</td>
+                                            <td className="px-5 py-4 text-muted-foreground">{classroom.code}</td>
+                                            <td className="max-w-md px-5 py-4 text-muted-foreground">{classroom.directions}</td>
+                                            <td className="px-5 py-4"><div className="flex justify-end gap-2"><EditClassroom classroom={classroom} setClassrooms={setClassrooms} /><DeleteClassroom classroom={classroom} setClassrooms={setClassrooms} /></div></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
+                )}
+            </section>
         </div>
-    </div>);
+    );
 }
 
 const ClassroomForm = ({ classroom, setClassrooms, onClose }: { classroom?: Classroom; setClassrooms: React.Dispatch<React.SetStateAction<Classroom[]>>; onClose: () => void }) => {

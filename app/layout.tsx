@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { CoursesProvider } from "@/hooks/use-courses"
+import { AmbientBackground } from "@/components/ambient-background"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -50,9 +51,12 @@ export default function RootLayout({
         <ThemeProvider>
           <CoursesProvider>
             <RoadmapProvider>
-              <Navbar />
-              {children}
-              <Footer />
+              <div className="relative isolate min-h-screen">
+                <AmbientBackground />
+                <Navbar />
+                {children}
+                <Footer />
+              </div>
             </RoadmapProvider>
           </CoursesProvider>
           <Analytics />
@@ -62,4 +66,3 @@ export default function RootLayout({
     </html>
   )
 }
-

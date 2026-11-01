@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { BookOpen, Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import type { Course, SemesterKey, YearKey } from "@/lib/types";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 
 const emptyCourse: Course = { id: "", code: "", name: "", credits: 3, year: "y1", offered: ["s1"], degrees: [], prereqs: [], description: "" };
 const semesters: { value: SemesterKey; label: string }[] = [
@@ -37,31 +38,87 @@ function sanitizePrerequisites(value: string) {
 export default function CoursesAdminPage() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         fetch("/api/courses").then((response) => response.json()).then(setCourses).finally(() => setLoading(false));
     }, []);
 
-    return <div className="flex flex-col">
-        <div className="flex justify-between bg-background px-4 py-8">
-            <h2 className="text-lg font-bold">Courses</h2>
-            <CourseForm setCourses={setCourses} />
+    const visibleCourses = courses.filter((course) => {
+        const query = search.trim().toLowerCase()
+        return !query || [course.code, course.name, ...course.degrees].some((value) => value.toLowerCase().includes(query))
+    })
+
+    return (
+        <div className="flex flex-col gap-6">
+            <AdminPageHeader
+                section="Moderation"
+                title="Courses"
+                description="Manage course details, degree eligibility, and prerequisites."
+                icon={BookOpen}
+                action={<CourseForm setCourses={setCourses} />}
+            />
+            <section className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
+                <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                    <div>
+                        <h2 className="font-semibold">Course catalogue</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">{visibleCourses.length} of {courses.length} courses</p>
+                    </div>
+                    <div className="relative w-full sm:max-w-xs">
+                        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input aria-label="Search courses" placeholder="Search courses..." value={search} onChange={(event) => setSearch(event.target.value)} className="pl-9" />
+                    </div>
+                </div>
+                {loading ? (
+                    <div className="flex justify-center py-14"><Loader2 className="size-5 animate-spin text-muted-foreground" aria-label="Loading courses" /></div>
+                ) : courses.length === 0 ? (
+                    <p className="px-6 py-12 text-center text-sm text-muted-foreground">No courses found. Add the first course to the catalogue.</p>
+                ) : visibleCourses.length === 0 ? (
+                    <p className="px-6 py-12 text-center text-sm text-muted-foreground">No courses match your search.</p>
+                ) : (
+                    <>
+                        <div className="space-y-3 p-3 md:hidden">
+                            {visibleCourses.map((course) => (
+                                <article key={course.id} className="rounded-xl border border-border/70 bg-background p-4">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <p className="font-semibold">{course.code}</p>
+                                            <p className="mt-1 text-sm text-muted-foreground">{course.name}</p>
+                                        </div>
+                                        <div className="flex shrink-0 gap-1">
+                                            <CourseForm course={course} setCourses={setCourses} />
+                                            <DeleteCourse course={course} setCourses={setCourses} />
+                                        </div>
+                                    </div>
+                                    <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                                        <span className="rounded-full bg-muted px-2.5 py-1">Year {course.year.slice(1)}</span>
+                                        <span className="rounded-full bg-muted px-2.5 py-1">{course.credits} credits</span>
+                                        {course.degrees.map((degree) => <span key={degree} className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{degree}</span>)}
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                        <div className="hidden overflow-x-auto md:block">
+                            <table className="w-full text-left text-sm">
+                                <thead className="border-b bg-muted/40 text-muted-foreground"><tr>
+                                    <th className="px-5 py-3 font-medium">Course</th><th className="px-5 py-3 font-medium">Level</th><th className="px-5 py-3 font-medium">Credits</th><th className="px-5 py-3 font-medium">Degrees</th><th className="px-5 py-3 text-right font-medium">Actions</th>
+                                </tr></thead>
+                                <tbody>
+                                    {visibleCourses.map((course) => (
+                                        <tr key={course.id} className="border-b last:border-0 hover:bg-muted/20">
+                                            <td className="px-5 py-4"><div className="font-semibold">{course.code}</div><div className="mt-0.5 text-muted-foreground">{course.name}</div></td>
+                                            <td className="px-5 py-4">Year {course.year.slice(1)}</td><td className="px-5 py-4">{course.credits}</td><td className="px-5 py-4">{course.degrees.join(", ") || "—"}</td>
+                                            <td className="px-5 py-4"><div className="flex justify-end gap-2"><CourseForm course={course} setCourses={setCourses} /><DeleteCourse course={course} setCourses={setCourses} /></div></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
+                )}
+            </section>
         </div>
-        <div className="relative overflow-x-auto rounded-base border border-default bg-neutral-primary-soft shadow-xs">
-            <table className="w-full text-left text-sm text-body">
-                <thead className="border-b border-default bg-neutral-secondary-soft"><tr>
-                    <th className="px-6 py-3 font-medium">Course</th><th className="px-6 py-3 font-medium">Level</th><th className="px-6 py-3 font-medium">Credits</th><th className="px-6 py-3 font-medium">Degrees</th><th className="px-6 py-3 text-right font-medium">Actions</th>
-                </tr></thead>
-                <tbody>
-                    {loading ? <tr><td colSpan={5} className="px-6 py-8 text-center"><Loader2 className="mx-auto size-5 animate-spin" aria-label="Loading courses" /></td></tr> : courses.length === 0 ? <tr><td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">No courses found.</td></tr> : courses.map((course) => <tr key={course.id} className="border-b border-default bg-neutral-primary">
-                        <td className="px-6 py-4"><div className="font-medium">{course.code}</div><div className="text-muted-foreground">{course.name}</div></td>
-                        <td className="px-6 py-4">Year {course.year.slice(1)}</td><td className="px-6 py-4">{course.credits}</td><td className="px-6 py-4">{course.degrees.join(", ")}</td>
-                        <td className="px-6 py-4"><div className="flex justify-end gap-2"><CourseForm course={course} setCourses={setCourses} /><DeleteCourse course={course} setCourses={setCourses} /></div></td>
-                    </tr>)}
-                </tbody>
-            </table>
-        </div>
-    </div>;
+    );
 }
 
 function CourseForm({ course, setCourses }: { course?: Course; setCourses: React.Dispatch<React.SetStateAction<Course[]>> }) {

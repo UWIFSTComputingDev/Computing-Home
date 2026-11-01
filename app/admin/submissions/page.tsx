@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Eye, Trash2, XCircle } from "lucide-react";
+import { CheckCircle2, Eye, MessageSquare, Trash2, XCircle } from "lucide-react";
 
 import {
     AlertDialog,
@@ -35,6 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useCourses } from "@/hooks/use-courses";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 
 type ModerationStatus = "pending" | "approved" | "rejected";
 type StatusFilter = "all" | ModerationStatus;
@@ -222,20 +223,20 @@ export default function SubmissionsPage() {
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-2xl font-semibold">Course Submissions</h1>
-                <p className="mt-1 text-sm text-muted-foreground">
-                    Review and moderate student advice, questions, and answers.
-                </p>
-            </div>
+            <AdminPageHeader
+                section="Moderation"
+                title="Course submissions"
+                description="Review student advice, questions, and answers before they appear publicly."
+                icon={MessageSquare}
+            />
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex w-full flex-wrap gap-2 rounded-xl border border-border/70 bg-card p-2 shadow-sm sm:w-fit">
                 {(["all", "pending", "approved", "rejected"] as const).map((status) => (
                     <Button
                         key={status}
-                        variant={statusFilter === status ? "default" : "outline"}
+                        variant={statusFilter === status ? "default" : "ghost"}
                         onClick={() => setStatusFilter(status)}
-                        className="capitalize"
+                        className="flex-1 capitalize sm:flex-none"
                     >
                         {status}
                     </Button>

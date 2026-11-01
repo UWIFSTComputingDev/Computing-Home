@@ -6,6 +6,7 @@ import {
     UserCog,
     UserPlus,
     Users,
+    LayoutDashboard,
 } from "lucide-react"
 
 import { db } from "@/db"
@@ -13,10 +14,11 @@ import { profiles, users } from "@/db/schema"
 import { Badge } from "@/components/ui/badge"
 import {
     Card,
+    CardContent,
     CardDescription,
-    CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import {
     Table,
     TableBody,
@@ -115,31 +117,39 @@ export default async function AdminDashboardPage() {
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-2xl font-semibold">Dashboard</h1>
-                <p className="text-sm text-muted-foreground">
-                    Overview of the department admin console.
-                </p>
-            </div>
+            <AdminPageHeader
+                section="Overview"
+                title="Dashboard"
+                description="A quick view of portal activity and the tools you manage."
+                icon={LayoutDashboard}
+            />
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
                 {stats.map((stat) => (
-                    <Link key={stat.label} href={stat.href}>
-                        <Card className="transition-colors hover:bg-muted/50">
-                            <CardHeader>
-                                <stat.icon className="size-5 text-muted-foreground" />
-                                <CardDescription>{stat.label}</CardDescription>
-                                <CardTitle className="text-3xl">{stat.value}</CardTitle>
-                            </CardHeader>
+                    <Link key={stat.label} href={stat.href} className="group">
+                        <Card className="h-full border-border/70 bg-card shadow-sm transition-all group-hover:-translate-y-0.5 group-hover:border-primary/30 group-hover:shadow-md">
+                            <CardContent className="flex items-start justify-between gap-3 p-5">
+                                <div>
+                                    <CardDescription>{stat.label}</CardDescription>
+                                    <CardTitle className="mt-3 text-3xl tabular-nums">{stat.value}</CardTitle>
+                                    <p className="mt-2 text-xs font-medium text-primary">View details <span aria-hidden="true">→</span></p>
+                                </div>
+                                <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                    <stat.icon className="size-5" />
+                                </span>
+                            </CardContent>
                         </Card>
                     </Link>
                 ))}
             </div>
 
-            <div className="flex flex-col gap-3">
-                <h2 className="text-lg font-semibold">Recent signups</h2>
+            <section className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
+                <div className="flex flex-col gap-1 border-b border-border/70 px-5 py-4 sm:px-6">
+                    <h2 className="text-base font-semibold">Recent signups</h2>
+                    <p className="text-sm text-muted-foreground">The latest accounts created on the portal.</p>
+                </div>
                 {metrics.recentSignups.length === 0 ? (
-                    <Empty className="border">
+                    <Empty className="border-0">
                         <EmptyHeader>
                             <EmptyMedia variant="icon">
                                 <UserPlus />
@@ -151,7 +161,25 @@ export default async function AdminDashboardPage() {
                         </EmptyHeader>
                     </Empty>
                 ) : (
-                    <div className="rounded-md border overflow-x-auto">
+                    <>
+                    <div className="space-y-3 p-3 md:hidden">
+                        {metrics.recentSignups.map((signup) => (
+                            <article key={signup.id} className="rounded-xl border border-border/70 bg-background p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <p className="truncate font-semibold">{signup.displayName ?? "Unnamed user"}</p>
+                                        <p className="mt-1 break-all text-sm text-muted-foreground">{signup.email}</p>
+                                    </div>
+                                    <Badge variant={signup.role === "admin" ? "default" : "outline"}>{signup.role}</Badge>
+                                </div>
+                                <div className="mt-3 flex items-center justify-between gap-3">
+                                    {signup.banned ? <Badge variant="destructive">Banned</Badge> : <Badge variant="secondary">Active</Badge>}
+                                    <span className="text-xs text-muted-foreground">{new Date(signup.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                    <div className="hidden overflow-x-auto md:block">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -187,8 +215,9 @@ export default async function AdminDashboardPage() {
                             </TableBody>
                         </Table>
                     </div>
+                    </>
                 )}
-            </div>
+            </section>
         </div>
     )
 }

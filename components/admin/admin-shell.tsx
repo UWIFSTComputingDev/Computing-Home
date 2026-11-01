@@ -13,9 +13,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div data-admin-shell className="min-h-screen">
             <AdminSidebar />
             <AdminMobileSidebar open={mobileNavOpen} onOpenChange={setMobileNavOpen} />
-            <div className="flex min-h-screen flex-col md:pl-64">
+            <div className="flex min-h-screen flex-col bg-muted/20 md:pl-64">
                 <AdminHeader onMenuClick={() => setMobileNavOpen(true)} />
-                <main className="flex-1 p-4 md:p-6">{children}</main>
+                <main className="mx-auto w-full max-w-[1600px] flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
             </div>
         </div>
     )

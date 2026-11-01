@@ -11,6 +11,25 @@ interface BookViewerProps {
 
 export function BookViewer({ pages }: BookViewerProps) {
   const [currentPage, setCurrentPage] = useState(0)
+  const [isSinglePage, setIsSinglePage] = useState(false)
+  const [turningPage, setTurningPage] = useState<{
+    direction: "next" | "previous"
+    frontPage: BookPage
+    backPage: BookPage
+  } | null>(null)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)")
+    const updatePageLayout = () => {
+      setIsSinglePage(mediaQuery.matches)
+      if (!mediaQuery.matches) {
+        setCurrentPage((page) => page - (page % 2))
+      }
+    }
+    updatePageLayout()
+    mediaQuery.addEventListener("change", updatePageLayout)
+    return () => mediaQuery.removeEventListener("change", updatePageLayout)
+  }, [])
 
   // Keyboard navigation
   useEffect(() => {
@@ -24,31 +43,46 @@ export function BookViewer({ pages }: BookViewerProps) {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [currentPage])
+  }, [currentPage, isSinglePage, turningPage])
 
   const goToNext = () => {
-  // Increment by 2 to turn a full "spread"
-  if (currentPage + 2 < pages.length) {
-    setCurrentPage((prev) => prev + 2);
+    const pageStep = isSinglePage ? 1 : 2
+    if (!turningPage && currentPage + pageStep < pages.length) {
+      const nextPage = currentPage + pageStep
+      const frontPage = pages[isSinglePage ? currentPage : currentPage + 1]
+      const backPage = pages[nextPage]
+      if (frontPage && backPage) {
+        setTurningPage({ direction: "next", frontPage, backPage })
+        setCurrentPage(nextPage)
+      }
+    }
   }
- };
 
-const goToPrevious = () => {
-  if (currentPage - 2 >= 0) {
-    setCurrentPage((prev) => prev - 2);
+  const goToPrevious = () => {
+    const pageStep = isSinglePage ? 1 : 2
+    if (!turningPage && currentPage >= pageStep) {
+      const previousPage = currentPage - pageStep
+      const frontPage = pages[currentPage]
+      const backPage = pages[isSinglePage ? previousPage : previousPage + 1]
+      if (frontPage && backPage) {
+        setTurningPage({ direction: "previous", frontPage, backPage })
+        setCurrentPage(previousPage)
+      }
+    }
   }
- };
 
   const leftPage = pages[currentPage];
-  const rightPage = (currentPage + 1 < pages.length) ? pages[currentPage + 1] : null;
+  const rightPage = !isSinglePage && currentPage + 1 < pages.length ? pages[currentPage + 1] : null
+  const isFirstPage = currentPage === 0
+  const isLastPage = currentPage + (isSinglePage ? 1 : 2) >= pages.length
 
   return (
-    <div className="relative mx-auto max-w-6xl">
+    <div className="relative mx-auto max-w-6xl px-1 pb-5 pt-2 sm:px-8">
       {/* Navigation Arrows */}
       <button
         onClick={goToPrevious}
-        disabled={currentPage === 0}
-        className="absolute left-0 top-1/2 z-10 -translate-x-12 -translate-y-1/2 rounded-full border border-[color:var(--border-color)] bg-[color:var(--card)] p-3 text-[color:var(--text)] shadow-lg transition-all hover:border-[color:var(--primary-color)] hover:bg-[color:var(--primary-color)]/10 disabled:opacity-30 disabled:hover:border-[color:var(--border-color)] disabled:hover:bg-[color:var(--card)]"
+        disabled={isFirstPage || turningPage !== null}
+        className="absolute left-0 top-1/2 z-20 -translate-x-1/3 -translate-y-1/2 rounded-full border border-white/20 bg-slate-950/85 p-3 text-white shadow-xl transition hover:bg-slate-800 disabled:opacity-30 sm:-translate-x-1/2"
         aria-label="Previous page"
       >
         <ChevronLeft className="h-6 w-6" />
@@ -56,42 +90,59 @@ const goToPrevious = () => {
 
       <button
         onClick={goToNext}
-        disabled={currentPage >= pages.length - 1}
-        className="absolute right-0 top-1/2 z-10 -translate-y-1/2 translate-x-12 rounded-full border border-[color:var(--border-color)] bg-[color:var(--card)] p-3 text-[color:var(--text)] shadow-lg transition-all hover:border-[color:var(--primary-color)] hover:bg-[color:var(--primary-color)]/10 disabled:opacity-30 disabled:hover:border-[color:var(--border-color)] disabled:hover:bg-[color:var(--card)]"
+        disabled={isLastPage || turningPage !== null}
+        className="absolute right-0 top-1/2 z-20 translate-x-1/3 -translate-y-1/2 rounded-full border border-white/20 bg-slate-950/85 p-3 text-white shadow-xl transition hover:bg-slate-800 disabled:opacity-30 sm:translate-x-1/2"
         aria-label="Next page"
       >
         <ChevronRight className="h-6 w-6" />
       </button>
 
       {/* Book Container */}
-      <div className="relative overflow-hidden rounded-2xl border-2 border-[color:var(--border-color)] bg-[color:var(--card)] shadow-2xl">
-        <div className="grid md:grid-cols-2">
-          {/* Left Page */}
-          {leftPage && (
-            <div className="border-r border-[color:var(--border-color)] p-8 md:p-12">
-              <BookPageContent page={leftPage} />
+      <div className="book-shell relative rounded-[1.4rem] p-2.5 shadow-[0_35px_80px_rgba(4,17,34,0.42)] sm:rounded-[2rem] sm:p-4">
+        <div
+          key={currentPage}
+          className="book-spread relative flex h-[min(76svh,760px)] min-h-[480px] flex-col overflow-hidden rounded-xl sm:rounded-2xl"
+        >
+          <div className={`grid min-h-0 flex-1 ${isSinglePage ? "grid-rows-1" : "grid-rows-2"} md:grid-cols-2 md:grid-rows-1`}>
+            {/* Left Page */}
+            {leftPage && (
+              <div className="book-page book-page-left relative min-h-0 overflow-y-auto border-b-0 p-6 sm:p-9 md:border-b-0 md:border-r md:p-12">
+                <BookPageContent page={leftPage} />
+              </div>
+            )}
+
+            {/* Right Page */}
+            {rightPage && (
+              <div className="book-page book-page-right relative min-h-0 overflow-y-auto p-6 sm:p-9 md:p-12">
+                <BookPageContent page={rightPage} />
+              </div>
+            )}
+          </div>
+
+          <div className="book-page flex shrink-0 items-center justify-between border-t border-[#8d6a3d]/20 px-5 py-3 text-xs font-semibold tracking-wide sm:px-8">
+            <span>DEPARTMENT OF COMPUTING</span>
+            <span>{currentPage + 1}{rightPage ? `–${currentPage + 2}` : ""} / {pages.length}</span>
+          </div>
+          {turningPage && (
+            <div
+              aria-hidden="true"
+              className={`book-turn-leaf book-turn-${turningPage.direction}`}
+              onAnimationEnd={() => setTurningPage(null)}
+            >
+              <div className="book-turn-face book-turn-front book-page p-6 sm:p-9 md:p-12">
+                <BookPageContent page={turningPage.frontPage} />
+              </div>
+              <div className="book-turn-face book-turn-back book-page p-6 sm:p-9 md:p-12">
+                <BookPageContent page={turningPage.backPage} />
+              </div>
             </div>
           )}
-
-          {/* Right Page */}
-          {rightPage && (
-            <div className={`p-8 md:p-12 ${!leftPage ? "md:col-span-2" : ""}`}>
-              <BookPageContent page={rightPage} />
-            </div>
-          )}
-        </div>
-
-        {/* Page Number Indicator */}
-        <div className="border-t border-[color:var(--border-color)] bg-[color:var(--bg)]/50 px-6 py-3 text-center">
-          <span className="text-sm text-[color:var(--muted)]">
-            Page {currentPage + 1} of {pages.length}
-          </span>
         </div>
       </div>
 
       {/* Touch/Swipe Instructions */}
       <div className="mt-4 text-center">
-        <p className="text-sm text-[color:var(--muted)]">Use arrow keys or click the arrows to navigate</p>
+        <p className="text-sm text-[color:var(--muted)]">Use arrow keys or the page-turn buttons to browse</p>
       </div>
     </div>
   )
@@ -100,7 +151,7 @@ const goToPrevious = () => {
 
 function BookPageContent({ page }: { page: BookPage }) {
   return (
-    <div className="flex h-full min-h-[400px] flex-col gap-6 text-left">
+    <div className="flex h-full min-h-0 flex-col gap-6 text-left">
       {/* 1. Title */}
       {page.title && <h2 className="text-2xl font-bold text-[color:var(--text)]">{page.title}</h2>}
 

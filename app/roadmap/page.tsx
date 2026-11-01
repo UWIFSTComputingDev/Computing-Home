@@ -41,6 +41,7 @@ export default function RoadMapPage() {
     const course = event.active.data.current?.course
     if (course) {
       setActiveCourse(course)
+      setSidebarOpen(false)
     }
   }
 
@@ -181,14 +182,14 @@ export default function RoadMapPage() {
               {/* Mobile Sidebar Toggle */}
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-(--primary-color) text-white shadow-lg"
+                className="lg:hidden fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg"
               >
                 {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
 
               {/* Sidebar */}
               <aside
-                className={`fixed inset-y-0 left-0 z-40 w-80 transform bg-(--bg) p-4 transition-transform lg:relative lg:inset-auto lg:z-auto lg:w-auto lg:transform-none lg:p-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+                className={`fixed inset-x-0 bottom-0 top-16 z-40 w-full transform bg-(--card)/75 p-4 backdrop-blur-xl transition-transform lg:relative lg:inset-auto lg:z-auto lg:w-auto lg:transform-none lg:bg-transparent lg:p-0 lg:backdrop-blur-none ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                   }`}
               >
                 <CourseSidebar />

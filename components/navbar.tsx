@@ -85,48 +85,40 @@ export function Navbar() {
   const initials = displayName.slice(0, 2).toUpperCase()
 
   return (
-    <motion.nav
-      initial={{ y: -16, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      className="sticky top-0 z-50 border-b border-border bg-(--bg)/80 backdrop-blur-lg supports-backdrop-filter:bg-(--bg)/60"
-    >
+    <nav className="navbar-shell sticky top-0 z-50 border-b">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4">
+        <div className="flex h-[4.5rem] items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/" className="flex shrink-0 items-center gap-3">
+          <Link href="/" className="group flex shrink-0 items-center gap-3" aria-label="Computing Department home">
             <Image
               src="/cs_logo.png"
               alt="Computer Science Logo"
-              width={40}
-              height={40}
-              className="rounded-full border-2 border-primary bg-white object-cover shadow-sm"
+              width={42}
+              height={42}
+              className="rounded-xl border border-border bg-white object-cover p-0.5 transition-transform duration-200 group-hover:-rotate-3"
             />
-            <span className="hidden bg-linear-to-r from-(--primary-color) to-(--accent-color) bg-clip-text text-lg font-bold tracking-tight text-transparent sm:inline">
-              Computing Department
+            <span className="leading-tight">
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-(--muted)">UWI · Mona</span>
+              <span className="mt-0.5 block text-sm font-bold tracking-tight text-(--text) sm:text-base">Computing Department</span>
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden min-w-0 flex-1 items-center justify-center lg:flex">
-            <div className="flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-border bg-(--card)/60 p-1 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex max-w-full items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:gap-2">
               {links.map((link) => {
                 const isActive = isNavActive(pathname, link.href)
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`relative shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors duration-200 xl:px-4 ${isActive ? "text-white" : "text-(--muted) hover:bg-(--card) hover:text-(--text)"
+                    aria-current={isActive ? "page" : undefined}
+                    className={`shrink-0 whitespace-nowrap border-b-2 px-2.5 py-2 text-[13px] font-medium transition-colors xl:px-3 ${isActive
+                      ? "border-(--primary-color) text-(--text)"
+                      : "border-transparent text-(--muted) hover:border-(--border-color) hover:text-(--text)"
                       }`}
                   >
-                    {isActive && (
-                      <motion.span
-                        layoutId="navbar-active-pill"
-                        className="absolute inset-0 -z-10 rounded-full bg-linear-to-r from-(--primary-color) to-(--accent-color) shadow-sm"
-                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                      />
-                    )}
-                    <span className="relative">{link.name}</span>
+                    {link.name}
                   </Link>
                 )
               })}
@@ -150,7 +142,7 @@ export function Navbar() {
             {/* Mobile menu button */}
             <button
               type="button"
-              className="rounded-lg p-2 text-(--muted) transition-colors hover:bg-(--card)/40 lg:hidden"
+              className="rounded-lg border border-transparent p-2 text-(--text) transition-colors hover:border-border hover:bg-(--card) lg:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle navigation menu"
             >
@@ -178,8 +170,8 @@ export function Navbar() {
                     key={link.href}
                     href={link.href}
                     className={`block rounded-lg px-3 py-2 text-base font-medium transition-colors ${isActive
-                      ? "bg-linear-to-r from-(--primary-color) to-(--accent-color) text-white"
-                      : "text-(--muted) hover:bg-(--bg) hover:text-(--text)"
+                      ? "border-l-2 border-(--primary-color) bg-(--secondary) text-(--text)"
+                      : "border-l-2 border-transparent text-(--muted) hover:bg-(--bg) hover:text-(--text)"
                       }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -223,7 +215,7 @@ export function Navbar() {
               ) : userLoaded ? (
                 <Link
                   href="/auth"
-                  className="flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-(--primary-color) to-(--accent-color) px-4 py-2 text-sm font-medium text-white shadow-sm"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-(--primary-color) px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <LogIn className="h-4 w-4" /> Sign In
@@ -233,7 +225,7 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </nav>
   )
 }
 
@@ -275,7 +267,7 @@ function AccountMenu({
         >
           <Avatar className="h-8 w-8 border border-border">
             <AvatarImage src={user.profile?.avatarUrl ?? undefined} alt={displayName} />
-            <AvatarFallback className="bg-linear-to-r from-(--primary-color) to-(--accent-color) text-xs font-semibold text-white">
+            <AvatarFallback className="bg-(--primary-color) text-xs font-semibold text-white">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -304,4 +296,3 @@ function AccountMenu({
     </DropdownMenu>
   )
 }
-
