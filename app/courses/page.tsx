@@ -45,7 +45,7 @@ export default function CoursesPage() {
                 course.name.toLowerCase().includes(q)
             );
         });
-    }, [query, yearFilter]);
+    }, [courses, query, yearFilter]);
 
     const grouped = useMemo(() => {
         const years: YearKey[] = ["y1", "y2", "y3", "y4"];
